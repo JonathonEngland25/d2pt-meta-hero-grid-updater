@@ -70,4 +70,15 @@
 3. On download, backup, or replace events, the main process checks the setting and shows a Windows notification if enabled.
 4. Status area notifications in the UI are always shown, regardless of the Windows notification setting.
 
+**File Purposes (Phase 14 additions):**
+- `main.js`: The `get-steamid-and-config-path` IPC handler now checks if the detected config path (via SteamID or manual override) actually exists. If not, it returns an error and does not return a config path. This ensures the app never operates on a missing or invalid directory.
+- `index.html`: The renderer listens for errors from `get-steamid-and-config-path`. If the config path is missing or invalid, the UI automatically opens the folder selection dialog, prompting the user to select a valid config folder. This prevents the user from proceeding without a valid path and streamlines recovery from missing/renamed directories.
+- `user-settings.json`: Continues to persist the manual config path if set. If the manual path is missing, the app prompts the user to select a new one at startup.
+
+**Phase 14 Flow:**
+1. On startup, the app checks for a valid config path (manual or auto-detected).
+2. If the path is missing or invalid, the user is immediately prompted to select a folder.
+3. The selected path is persisted and used for all future operations.
+4. This ensures robust handling of missing/renamed Steam or config directories and a seamless user experience.
+
 ---

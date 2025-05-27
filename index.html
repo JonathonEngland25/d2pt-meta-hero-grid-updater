@@ -139,6 +139,16 @@
             document.getElementById('steamid-value').textContent = 'N/A';
             document.getElementById('config-path-value').textContent = 'N/A';
             showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
+            // Auto-prompt for folder selection if config path is missing
+            if (result && result.error) {
+              // Only prompt once per error occurrence
+              const folderPath = await ipcRenderer.invoke('select-config-folder');
+              if (folderPath) {
+                // After persisting, re-fetch config info to update UI
+                updateSteamIDAndConfigPath();
+                showStatus('Config path updated and saved!', '#0f0');
+              }
+            }
           }
         } else {
           showStatus('Electron IPC not available.', '#f00');

@@ -188,11 +188,21 @@ ipcMain.handle('get-steamid-and-config-path', async (event, opts = {}) => {
   let settings = loadPersistedSettings();
   // If manual config path is set, use it
   if (settings.manualConfigPath) {
-    return {
-      steamid: settings.steamid || null,
-      configPath: settings.manualConfigPath,
-      manual: true
-    };
+    // Check if manual config path exists
+    if (fs.existsSync(settings.manualConfigPath)) {
+      return {
+        steamid: settings.steamid || null,
+        configPath: settings.manualConfigPath,
+        manual: true
+      };
+    } else {
+      return {
+        steamid: settings.steamid || null,
+        configPath: null,
+        manual: true,
+        error: 'Manual config path does not exist. Please select your config folder again.'
+      };
+    }
   }
   let steamid = null;
   if (!forceSelect && settings.steamid) {
@@ -201,11 +211,21 @@ ipcMain.handle('get-steamid-and-config-path', async (event, opts = {}) => {
     steamid = await detectSteamID(win, forceSelect);
   }
   if (steamid) {
-    return {
-      steamid,
-      configPath: getConfigPath(steamid),
-      manual: false
-    };
+    const configPath = getConfigPath(steamid);
+    if (fs.existsSync(configPath)) {
+      return {
+        steamid,
+        configPath,
+        manual: false
+      };
+    } else {
+      return {
+        steamid,
+        configPath: null,
+        manual: false,
+        error: 'Detected config path does not exist. Please select your config folder.'
+      };
+    }
   } else {
     return {
       steamid: null,

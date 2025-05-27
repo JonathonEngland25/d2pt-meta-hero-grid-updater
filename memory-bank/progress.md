@@ -163,4 +163,17 @@
 - Disable the checkbox and confirm notifications no longer appear.
 - Confirm that status area notifications always appear regardless of the Windows notification setting.
 
+## Step 14: Manual Override for Config Path (Persistent) (Completed)
+- Fixed a bug where the app did not detect when the Steam directory or config path was missing or renamed at startup.
+- Now, after detecting the config path (either via SteamID or manual override), the app checks if the path actually exists.
+- If the config path does not exist, the app returns an error and prompts the user to select the config folder via a native dialog.
+- The UI now automatically opens the folder selection dialog if the config path is missing or invalid, ensuring the user cannot proceed without a valid path.
+- The selected path is persisted and used for all future operations until changed or removed.
+
+**How to test:**
+- Rename or remove your Steam directory or config path.
+- Start the app.
+- The app should immediately prompt you to select the config folder.
+- Select a folder and confirm it persists across restarts and is used for all operations.
+
 ---

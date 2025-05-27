@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Notification } = require('electron');
 const path = require('path');
 const gotImport = require('got');
 const cheerio = require('cheerio');
@@ -112,8 +112,10 @@ ipcMain.handle('download-grid-json', async (event, gridType) => {
     } catch (e) {
       throw new Error('Downloaded file is not valid JSON.');
     }
+    maybeNotify('Download Successful', `Grid JSON for ${gridType} downloaded.`);
     return { success: true, json };
   } catch (err) {
+    maybeNotify('Download Failed', err.message);
     return { success: false, error: err.message };
   }
 });
@@ -261,9 +263,47 @@ ipcMain.handle('backup-hero-grid', async (event, { configPath, silent }) => {
       }
       fs.renameSync(gridFile, backupFile);
       didBackup = true;
+      maybeNotify('Grid Backup', 'Existing hero_grid_config.json backed up successfully.');
     }
     return { success: true, didBackup, warningShown };
   } catch (err) {
+    maybeNotify('Backup Failed', err.message);
     return { success: false, error: err.message };
   }
+});
+
+// Phase 12: Replace Grid (Save Downloaded JSON as hero_grid_config.json)
+ipcMain.handle('replace-hero-grid', async (event, { configPath, json }) => {
+  const gridFile = path.join(configPath, 'hero_grid_config.json');
+  try {
+    fs.writeFileSync(gridFile, JSON.stringify(json, null, 2), 'utf-8');
+    maybeNotify('Grid Updated', 'hero_grid_config.json updated successfully.');
+    return { success: true };
+  } catch (err) {
+    maybeNotify('Update Failed', err.message);
+    return { success: false, error: err.message };
+  }
+});
+
+// Helper: Show Windows notification if enabled
+function maybeNotify(title, body) {
+  let settings = loadPersistedSettings();
+  if (settings.enableWindowsNotifications) {
+    if (Notification.isSupported()) {
+      new Notification({ title, body }).show();
+    }
+  }
+}
+
+// IPC to get/set notification setting
+ipcMain.handle('get-notification-setting', async () => {
+  let settings = loadPersistedSettings();
+  return { enabled: !!settings.enableWindowsNotifications };
+});
+
+ipcMain.handle('set-notification-setting', async (event, enabled) => {
+  let settings = loadPersistedSettings();
+  settings.enableWindowsNotifications = !!enabled;
+  savePersistedSettings(settings);
+  return { success: true };
 }); 

@@ -139,4 +139,28 @@
 - On subsequent runs, confirm the backup is silently overwritten and no warning is shown.
 - If no grid exists, confirm the app proceeds to download without backup or warning.
 
+## Step 12: Replace Grid (Completed)
+- Implemented logic to save the downloaded grid JSON as `hero_grid_config.json` in the config folder after backup and download steps.
+- Added a new IPC handler (`replace-hero-grid`) in `main.js` that writes the JSON to the correct file.
+- Updated the renderer logic in `index.html` to call this handler after a successful download, and to show a status message for success or failure.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Select a grid type and click "Download & Update".
+- Confirm that after backup and download, the new `hero_grid_config.json` file is created/overwritten in the config folder with the correct content.
+- Check the status area for a success or error message after the update step.
+
+## Step 13: Notifications and Windows Notifications Option (Completed)
+- Added logic to display success or failure notifications for download, backup, and replace steps in the status area.
+- Added an option in the UI (checkbox) to enable Windows notifications for these events.
+- When enabled, the app uses Electron's Notification API to show native Windows notifications for download, backup, and replace events (success or failure), including in silent/background mode.
+- The notification setting is persisted in user-settings.json and can be toggled from the UI.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Use the checkbox below the status area to enable or disable Windows notifications.
+- Perform a download/update operation (with and without backup present) and verify that notifications appear in the Windows notification center if enabled.
+- Disable the checkbox and confirm notifications no longer appear.
+- Confirm that status area notifications always appear regardless of the Windows notification setting.
+
 ---

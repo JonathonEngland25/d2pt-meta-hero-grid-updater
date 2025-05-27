@@ -50,4 +50,24 @@
 4. Only after backup (or if no grid exists), the renderer proceeds to download the new grid.
 5. Status messages are shown for each step, improving transparency and UX.
 
+**File Purposes (Phase 12 additions):**
+- `main.js`: Now includes an IPC handler (`replace-hero-grid`) that saves the downloaded grid JSON as `hero_grid_config.json` in the config folder. This handler takes the config path and JSON data, writes the file, and returns success or error.
+- `index.html`: The renderer now calls `replace-hero-grid` after a successful download, passing the config path and JSON. The UI displays a status message for success or failure of the update step.
+
+**Phase 12 Flow:**
+1. After backup and download, the renderer calls `replace-hero-grid` via IPC, passing the config path and downloaded JSON.
+2. The main process writes the JSON to `hero_grid_config.json` in the config folder.
+3. The renderer displays a success or error message in the status area, informing the user of the result.
+
+**File Purposes (Phase 13 additions):**
+- `main.js`: Now includes logic to send Windows notifications using Electron's Notification API for download, backup, and replace steps. A helper (`maybeNotify`) checks if notifications are enabled in user-settings.json and shows them if so. IPC handlers allow the renderer to get/set this setting.
+- `index.html`: Adds a checkbox to the UI to enable/disable Windows notifications. The checkbox state is loaded from the main process on startup and persisted via IPC. When enabled, users receive native Windows notifications for relevant events in addition to status area messages.
+- `user-settings.json`: Now includes an `enableWindowsNotifications` boolean flag to persist the user's preference for Windows notifications.
+
+**Phase 13 Flow:**
+1. User toggles the "Enable Windows notifications" checkbox in the UI.
+2. The renderer calls an IPC handler to update the setting in user-settings.json.
+3. On download, backup, or replace events, the main process checks the setting and shows a Windows notification if enabled.
+4. Status area notifications in the UI are always shown, regardless of the Windows notification setting.
+
 ---

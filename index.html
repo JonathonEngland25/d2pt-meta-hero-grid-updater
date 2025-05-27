@@ -32,6 +32,12 @@
     <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
     <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
     <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
+    <!-- Phase 13: Windows Notifications Option -->
+    <div style="margin-bottom: 1rem;">
+      <label>
+        <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
+      </label>
+    </div>
     <!-- Step 5: SteamID & Config Path Display -->
     <div id="steamid-config-section" style="margin-bottom: 1rem;">
       <div>SteamID: <span id="steamid-value">N/A</span></div>
@@ -100,6 +106,13 @@
           if (result.success) {
             showStatus('Download successful! Example: ' + JSON.stringify(result.json).slice(0, 100) + '...');
             console.log('Downloaded grid JSON:', result.json);
+            // Phase 12: Replace grid
+            const replaceResult = await ipcRenderer.invoke('replace-hero-grid', { configPath: configResult.configPath, json: result.json });
+            if (replaceResult.success) {
+              showStatus('Grid updated successfully!', '#0f0');
+            } else {
+              showStatus('Failed to update grid: ' + replaceResult.error, '#f00');
+            }
           } else {
             showStatus('Download failed: ' + result.error, '#f00');
             console.error('Download error:', result.error);
@@ -198,6 +211,21 @@
           showStatus('Remove schedule not available in this environment.', '#f00');
         }
       });
+      // Phase 13: Windows Notifications Option
+      const notifyCheckbox = document.getElementById('windows-notify-checkbox');
+      async function updateNotifyCheckbox() {
+        if (ipcRenderer) {
+          const result = await ipcRenderer.invoke('get-notification-setting');
+          notifyCheckbox.checked = !!(result && result.enabled);
+        }
+      }
+      notifyCheckbox.addEventListener('change', async () => {
+        if (ipcRenderer) {
+          await ipcRenderer.invoke('set-notification-setting', notifyCheckbox.checked);
+          showStatus('Windows notifications ' + (notifyCheckbox.checked ? 'enabled!' : 'disabled!'), '#0af');
+        }
+      });
+      updateNotifyCheckbox();
     </script>
   </div>
 </body>

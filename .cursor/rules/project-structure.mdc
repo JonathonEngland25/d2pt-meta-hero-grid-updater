@@ -1,0 +1,29 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# IMPORTANT:
+Always read [architecture.md](mdc:memory-bank/architecture.md) before writing any code. Include entire database schema.
+Always read [implementation-plan.md](mdc:memory-bank/implementation-plan.md) before writing any code.
+After adding a major feature or completing a milestone, update [architecture.md](mdc:memory-bank/architecture.md).
+
+# Project Structure Guide
+
+This project is for the **Dota 2 Meta Hero Grid Updater**, a Windows desktop app to automate updating Dota 2 hero grids.
+
+## Key Documents
+- [PRD.md](mdc:memory-bank/PRD.md): Product requirements, user stories, and feature list.
+- [implementation-plan.md](mdc:memory-bank/implementation-plan.md): Step-by-step implementation plan for the app.
+- [tech-stack.md](mdc:memory-bank/tech-stack.md): Technologies and frameworks used in the project.
+- [architecture.md](mdc:memory-bank/architecture.md): (Currently empty) Intended for high-level architecture notes.
+- [progress.md](mdc:memory-bank/progress.md): (Currently empty) Intended for tracking project progress.
+
+## Main Features (see [PRD.md](mdc:memory-bank/PRD.md) and [implementation-plan.md](mdc:memory-bank/implementation-plan.md))
+- UI for selecting hero grid type and updating config
+- Automatic SteamID detection and config path management
+- Backup and replace of hero grid config
+- Windows Task Scheduler integration for weekly updates
+- Error handling, notifications, and logging
+
+All source code and UI implementation details are to be added in the main project directory (not present yet). See the above documents for guidance on structure and features.

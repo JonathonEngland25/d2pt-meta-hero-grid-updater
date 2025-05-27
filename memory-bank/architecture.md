@@ -83,4 +83,15 @@
 6. The user is shown a clear error message in the status area and, if enabled, as a Windows notification.
 7. Developers and users can inspect `error.log` in the user data directory for troubleshooting and support.
 
+**File Purposes (Phase 15 additions):**
+- `main.js`: Implements system tray support for background operation. Uses Electron's Tray and Menu APIs to create a tray icon, context menu, and event handlers. The main window is hidden (not closed) when minimized or closed, and can be restored from the tray. The tray icon uses `icon.ico` from the project root (or a default/blank icon if missing). The app only quits when 'Exit' is selected from the tray menu.
+- `icon.ico`: The tray icon file, required in the project root for proper tray display on Windows. Should be a valid Windows .ico file (e.g., 16x16 or 32x32 pixels). If missing or invalid, Electron may show a blank or default icon.
+
+**Phase 15 Flow:**
+1. On app launch, the main window is created as usual.
+2. A tray icon is created using Electron's Tray API, with a context menu ('Show', 'Exit').
+3. When the user minimizes or closes the window, the window is hidden instead of quitting the app.
+4. The user can restore the window by double-clicking the tray icon or selecting 'Show' from the context menu.
+5. The app only quits when 'Exit' is selected from the tray menu.
+
 ---

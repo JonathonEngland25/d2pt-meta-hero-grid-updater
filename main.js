@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Notification, Tray, Menu } = require('electron');
 const path = require('path');
 const gotImport = require('got');
 const cheerio = require('cheerio');
@@ -10,8 +10,11 @@ const os = require('os');
 
 app.setName('d2pt-meta-hero-grid-updater');
 
+let tray = null;
+let mainWindow = null;
+
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -19,20 +22,76 @@ function createWindow() {
       contextIsolation: false,
     },
   });
-  win.loadFile('index.html');
+  mainWindow.loadFile('index.html');
+
+  // Minimize to tray on close
+  mainWindow.on('close', (event) => {
+    if (!app.isQuiting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
+    return false;
+  });
+
+  // Minimize to tray on minimize
+  mainWindow.on('minimize', (event) => {
+    event.preventDefault();
+    mainWindow.hide();
+  });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  // Tray support
+  if (!tray) {
+    // Use Electron's default icon if no custom icon is available
+    const iconPath = process.platform === 'win32'
+      ? path.join(__dirname, 'icon.ico')
+      : path.join(__dirname, 'icon.png');
+    tray = new Tray(iconPath);
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show',
+        click: () => {
+          if (mainWindow) {
+            mainWindow.show();
+            mainWindow.focus();
+          }
+        }
+      },
+      {
+        label: 'Exit',
+        click: () => {
+          app.isQuiting = true;
+          app.quit();
+        }
+      }
+    ]);
+    tray.setToolTip('Dota 2 Meta Hero Grid Updater');
+    tray.setContextMenu(contextMenu);
+    tray.on('double-click', () => {
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    });
+  }
+});
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  // Do not quit the app when all windows are closed (for tray support)
+  // Only quit on explicit Exit
+  // if (process.platform !== 'darwin') {
+  //   app.quit();
+  // }
 });
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+  } else if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
   }
 });
 

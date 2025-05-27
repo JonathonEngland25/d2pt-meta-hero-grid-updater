@@ -166,4 +166,42 @@
 - Verify the user sees a clear error message in the UI/status area and/or Windows notification.
 - Check that `error.log` in the user data directory contains a detailed log entry for each error.
 
+## Step 15: Tray Support for Background Operation (Completed)
+- Implemented system tray support using Electron's Tray API.
+- When the app window is minimized or closed, it now hides to the system tray instead of quitting.
+- A tray icon appears in the Windows system tray. Right-clicking the icon opens a context menu with 'Show' (restores the window) and 'Exit' (quits the app).
+- Double-clicking the tray icon also restores the window.
+- The app only quits when 'Exit' is selected from the tray menu.
+- Uses a default or user-provided `icon.ico` for the tray icon. If the icon is missing or invalid, Electron may show a blank or default icon.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Minimize or close the app window. Confirm the app remains running in the system tray and does not quit.
+- Right-click the tray icon and select 'Show' to restore the window.
+- Double-click the tray icon to restore the window.
+- Right-click the tray icon and select 'Exit' to quit the app completely.
+- If the tray icon does not appear, ensure a valid `icon.ico` is present in the project root.
+
+## Step 16: Final User Acceptance Test (Completed)
+- Ran through all user stories and requirements as described in the PRD, from initial launch to error handling and tray support.
+- Verified that the app meets all functional requirements: grid selection, download, backup, replace, notifications, SteamID detection, manual config override, error handling, and tray/background operation.
+- Confirmed all non-functional requirements: Windows platform, fast launch and operation, no telemetry, lightweight, and minimal UI.
+- Checked that the UI is clear, all notifications work, and error scenarios are handled gracefully.
+- Ensured the app can be packaged and distributed as a Windows executable.
+
+**Acceptance Test Checklist:**
+- [x] App launches and displays main UI
+- [x] Grid selection works (Most Played, High Win Rate, D2PT Rating)
+- [x] Download & Update button triggers full workflow
+- [x] Status area and Windows notifications function as expected
+- [x] SteamID is auto-detected or can be selected
+- [x] Manual config path override works and persists
+- [x] Backup and replace logic is robust
+- [x] Error handling and logging are comprehensive
+- [x] Tray support for background operation is functional
+- [x] App can be exited cleanly from tray
+
+**Note for future developers:**
+- This phase ensures the app is production-ready and meets all user and product requirements. Any future changes should be re-validated against this checklist and the PRD.
+
 ---

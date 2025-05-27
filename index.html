@@ -15,7 +15,30 @@
 <body>
   <div class="container">
     <h1>Dota 2 Meta Hero Grid Updater</h1>
+    <form id="grid-form" style="margin-bottom: 1.5rem;">
+      <label style="margin-right: 1em;">
+        <input type="radio" name="grid" value="Most Played" checked>
+        Most Played
+      </label>
+      <label style="margin-right: 1em;">
+        <input type="radio" name="grid" value="High Win Rate">
+        High Win Rate
+      </label>
+      <label>
+        <input type="radio" name="grid" value="D2PT Rating">
+        D2PT Rating
+      </label>
+    </form>
+    <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
     <p>Placeholder UI - Step 1</p>
+    <script>
+      const form = document.getElementById('grid-form');
+      const selectedGrid = document.getElementById('selected-grid');
+      form.addEventListener('change', (e) => {
+        const value = form.grid.value;
+        selectedGrid.innerHTML = `Selected: <b>${value}</b>`;
+      });
+    </script>
   </div>
 </body>
 </html> 

@@ -11,4 +11,14 @@
 - Run `npm start` in the project directory.
 - Verify that a window opens displaying the app name and a placeholder message.
 
+## Step 2: UI Grid Selection (Completed)
+- Added three radio buttons to the UI for grid selection: "Most Played", "High Win Rate", and "D2PT Rating".
+- Added a display area below the radio buttons to show the currently selected grid.
+- Implemented minimal JavaScript to update the display live as the user changes their selection.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Verify that the app window shows the three grid options.
+- Select each option and confirm the "Selected" display updates accordingly.
+
 ---

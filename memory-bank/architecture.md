@@ -15,5 +15,8 @@
 - `Select Config Folder` button (in `index.html`): UI button below the config path display. Allows the user to manually select the Dota 2 config folder if automatic detection is incorrect or fails.
 - Button click event handler (in `index.html` <script>): Uses Electron's `ipcRenderer` to invoke the 'select-config-folder' IPC channel, requesting the main process to open a folder selection dialog. Updates the config path display and shows a status message when a folder is selected.
 - `ipcMain.handle('select-config-folder', ...)` (in `main.js`): Handles the IPC request from the renderer. Opens a native folder selection dialog using Electron's `dialog` module and returns the selected folder path to the renderer process.
+- `scheduling-section` (in `index.html`): UI section for scheduling weekly updates. Includes a day-of-week dropdown, time picker, "Schedule Weekly Update" button, "Remove/Modify Schedule" button, and a display for the current schedule status. Handles user input for scheduling and removal of weekly update tasks.
+- Scheduling logic (in `index.html` <script>): JavaScript code that listens for scheduling/removal actions, updates the UI state, and communicates with the main process via IPC.
+- `ipcMain.handle('schedule-weekly-update', ...)` and `ipcMain.handle('remove-weekly-schedule', ...)` (in `main.js`): IPC handlers that receive scheduling/removal requests from the renderer. Currently simulate scheduling/removal and return success. Will be extended in later phases to integrate with Windows Task Scheduler.
 
 ---

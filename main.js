@@ -35,4 +35,16 @@ ipcMain.handle('select-config-folder', async (event) => {
     return null;
   }
   return result.filePaths[0];
+});
+
+ipcMain.handle('schedule-weekly-update', async (event, { day, time }) => {
+  console.log(`Simulating scheduling: Weekly update on ${day} at ${time}`);
+  // Simulate success
+  return { success: true };
+});
+
+ipcMain.handle('remove-weekly-schedule', async (event) => {
+  console.log('Simulating removal of scheduled weekly update');
+  // Simulate success
+  return { success: true };
 }); 

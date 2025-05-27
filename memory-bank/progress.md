@@ -64,4 +64,25 @@
 - Select a folder in the dialog and confirm the config path display updates to the selected folder.
 - A green status message should appear confirming the update.
 
+## Step 7: UI Scheduling Section (Completed)
+- Added a new section to the UI for scheduling weekly updates, including:
+  - Day-of-week dropdown
+  - Time picker
+  - "Schedule Weekly Update" button
+  - "Remove/Modify Schedule" button
+  - Display of current schedule status
+- Implemented renderer logic to handle scheduling/removal actions and update UI state.
+- Added IPC communication to main process for scheduling/removal (simulated for now).
+
+**How to test:**
+- Run `npm start` in the project directory.
+- In the app, set a day and time, then click "Schedule Weekly Update".
+  - The status should update to show the scheduled day/time.
+  - A notification should appear.
+  - The console should log the simulated scheduling.
+- Click "Remove/Modify Schedule".
+  - The status should reset to "No schedule set."
+  - A notification should appear.
+  - The console should log the simulated removal.
+
 ---

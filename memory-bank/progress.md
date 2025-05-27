@@ -21,4 +21,14 @@
 - Verify that the app window shows the three grid options.
 - Select each option and confirm the "Selected" display updates accordingly.
 
+## Step 3: UI Download & Update Button (Completed)
+- Added a "Download & Update" button below the grid selection in the UI.
+- Implemented a click event handler for the button that logs a message to the console when clicked.
+- Updated the placeholder text to indicate Step 3 progress.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Verify that the app window shows the "Download & Update" button below the grid selection.
+- Click the button and confirm that a message is logged to the console (open Developer Tools with Ctrl+Shift+I to view the console).
+
 ---

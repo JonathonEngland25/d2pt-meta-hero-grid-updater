@@ -30,13 +30,20 @@
       </label>
     </form>
     <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
-    <p>Placeholder UI - Step 1</p>
+    <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
+    <p>Placeholder UI - Step 3</p>
     <script>
       const form = document.getElementById('grid-form');
       const selectedGrid = document.getElementById('selected-grid');
       form.addEventListener('change', (e) => {
         const value = form.grid.value;
         selectedGrid.innerHTML = `Selected: <b>${value}</b>`;
+      });
+      // Step 3: Download & Update button click event
+      const downloadBtn = document.getElementById('download-update-btn');
+      downloadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Download & Update button clicked');
       });
     </script>
   </div>

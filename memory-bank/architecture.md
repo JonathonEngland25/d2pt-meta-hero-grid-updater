@@ -27,4 +27,27 @@
 - `index.html`: Main UI, including grid selection, download button, and persistent status area for user feedback.
 - `package.json`: Now includes Puppeteer as a dependency for headless browser automation.
 
+**File Purposes (Phase 9 additions):**
+- `user-settings.json`: Stores user preferences, including the selected SteamID, in Electron's user data directory (`AppData/Roaming/d2pt-meta-hero-grid-updater/`).
+- `main.js`: Now includes logic to scan for SteamIDs, prompt the user if multiple are found, persist the selection, and allow flushing settings via a command-line argument (`--flush`).
+- `index.html`: UI now includes a "Change SteamID" button to let the user re-select their SteamID at any time. The UI updates to reflect the current SteamID and config path.
+- **Settings Reset:** Running the app with `--flush` deletes `user-settings.json`, resetting all persisted user settings and requiring the user to select a SteamID again on next launch.
+
+**File Purposes (Phase 10 additions):**
+- `user-settings.json`: Now also stores the manually selected config path as `manualConfigPath`. If set, this path is used for all config operations and displayed in the UI with a '(manual)' indicator.
+- `main.js`: When the user selects a config folder, the path is persisted in `user-settings.json`. On app launch, if `manualConfigPath` is set, it is returned by the `get-steamid-and-config-path` IPC handler and used in place of the SteamID-based path. An IPC handler to clear the manual path is also present for future UX improvements.
+- `index.html`: When the user selects a config folder, the UI updates and the path is persisted. On launch, the UI displays the manual path if set, or the auto-detected path otherwise. The config path display shows '(manual)' if the manual path is active.
+
+**File Purposes (Phase 11 additions):**
+- `main.js`: Now includes an IPC handler (`backup-hero-grid`) that checks for an existing hero_grid_config.json in the config folder and renames it to hero_grid_config_backup.json before any update. On first run, it shows a warning dialog (unless in silent mode) and persists a flag in user-settings.json to avoid repeat warnings. This ensures user data safety and clear communication.
+- `index.html`: The renderer now calls the backup-hero-grid IPC handler before downloading the new grid. Status messages are shown for backup and download steps, ensuring the user is informed of each operation.
+- `user-settings.json`: Now also stores a flag (`backupWarningShown`) to track if the first-run backup warning has been shown, preventing repeated dialogs.
+
+**Phase 11 Flow:**
+1. User clicks "Download & Update".
+2. Renderer fetches the config path via IPC.
+3. Renderer calls `backup-hero-grid` via IPC. If a grid exists, it is backed up and a warning is shown on first run.
+4. Only after backup (or if no grid exists), the renderer proceeds to download the new grid.
+5. Status messages are shown for each step, improving transparency and UX.
+
 ---

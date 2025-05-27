@@ -98,4 +98,45 @@
 - Try all grid types to ensure each downloads correctly.
 - Confirm that error messages persist if a failure occurs.
 
+## Step 9: SteamID Detection, Selection, and Persistence (Completed)
+- Implemented logic to scan the Steam userdata directory for SteamIDs.
+- If only one SteamID is found, it is used automatically.
+- If multiple SteamIDs are found, the user is prompted to select one via a dialog.
+- The selected SteamID is persisted in a user settings file for future runs.
+- Added a "Change SteamID" button in the UI to allow the user to re-select their SteamID at any time.
+- Added a command-line argument `--flush` to delete all user settings (including the persisted SteamID) before the app starts.
+
+**How to test:**
+- Run `npm start` in the project directory with one SteamID in the userdata folder. The app should auto-select it.
+- Add a second SteamID folder and run `npm start` again. The app should prompt you to select which SteamID to use.
+- Click the "Change SteamID" button in the UI to re-select your SteamID at any time.
+- Run `npm start -- --flush` to delete all user settings. The app should prompt for SteamID selection again on next launch.
+
+## Step 10: Config Path Construction and Persistence (Completed)
+- Updated the app to persist the manually selected config path in user-settings.json.
+- When the user selects a config folder, the path is saved and used for future launches.
+- On app launch, if a manual config path is set, it is displayed in the UI (with a '(manual)' indicator) and used for all operations.
+- If no manual path is set, the app falls back to automatic SteamID-based detection.
+- Added an IPC handler to clear the manual config path (for future UX improvements).
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Click the "Select Config Folder" button and choose a folder.
+- Confirm the config path display updates and shows '(manual)'.
+- Restart the app and verify the manual path persists.
+- Optionally, clear the manual path (feature for future) and confirm the app returns to automatic detection.
+
+## Step 11: Backup Existing Grid with Warning Logic (Completed)
+- Implemented logic in the main process (main.js) to back up the existing hero_grid_config.json as hero_grid_config_backup.json before replacing it.
+- On the first run, the app shows a warning dialog to inform the user that the backup will be overwritten on each update. This warning is only shown once (unless running in silent/background mode).
+- The backup step is now triggered from the UI before downloading and replacing the grid.
+- Status messages are shown in the UI for backup and download steps.
+
+**How to test:**
+- Place a test hero_grid_config.json in the config folder.
+- Click "Download & Update" in the app.
+- Confirm that a backup is created (hero_grid_config_backup.json) and the warning appears the first time.
+- On subsequent runs, confirm the backup is silently overwritten and no warning is shown.
+- If no grid exists, confirm the app proceeds to download without backup or warning.
+
 ---

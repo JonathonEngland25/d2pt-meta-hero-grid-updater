@@ -34,9 +34,10 @@
     <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
     <!-- Step 5: SteamID & Config Path Display -->
     <div id="steamid-config-section" style="margin-bottom: 1rem;">
-      <div>SteamID: <span id="steamid-value">123456789</span></div>
-      <div>Config Path: <span id="config-path-value">C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg</span></div>
+      <div>SteamID: <span id="steamid-value">N/A</span></div>
+      <div>Config Path: <span id="config-path-value">N/A</span></div>
       <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
+      <button id="change-steamid-btn" style="margin-top: 0.5em; margin-left: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Change SteamID</button>
     </div>
     <!-- Phase 7: Scheduling Section -->
     <div id="scheduling-section" style="margin-bottom: 1.5rem; border: 1px solid #444; padding: 1em; border-radius: 8px; background: #292929; max-width: 400px; margin-left: auto; margin-right: auto;">
@@ -76,10 +77,27 @@
         e.preventDefault();
         const gridType = form.grid.value;
         if (ipcRenderer) {
-          showStatus('Downloading grid...');
+          // Step 1: Get config path
+          const configResult = await ipcRenderer.invoke('get-steamid-and-config-path');
+          if (!configResult || !configResult.configPath) {
+            showStatus('Config path not found. Please select your config folder.', '#f00');
+            return;
+          }
+          // Step 2: Backup existing grid
+          showStatus('Backing up existing grid (if present)...', '#0af');
+          const backupResult = await ipcRenderer.invoke('backup-hero-grid', { configPath: configResult.configPath, silent: false });
+          if (!backupResult.success) {
+            showStatus('Backup failed: ' + backupResult.error, '#f00');
+            return;
+          }
+          if (backupResult.didBackup) {
+            showStatus('Backup created. Downloading grid...', '#0af');
+          } else {
+            showStatus('No existing grid to back up. Downloading grid...', '#0af');
+          }
+          // Step 3: Download grid
           const result = await ipcRenderer.invoke('download-grid-json', gridType);
           if (result.success) {
-            // For test: display a snippet of the JSON in the status area
             showStatus('Download successful! Example: ' + JSON.stringify(result.json).slice(0, 100) + '...');
             console.log('Downloaded grid JSON:', result.json);
           } else {
@@ -96,22 +114,52 @@
         statusArea.style.color = color;
         // Removed auto-clear for persistent status messages
       }
-      // Step 5: Set test values for SteamID and config path
-      document.getElementById('steamid-value').textContent = '123456789';
-      document.getElementById('config-path-value').textContent = 'C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg';
-      // Step 6: Manual Config Path Selection
+      // Step 5: SteamID and config path detection
       const { ipcRenderer } = window.require ? window.require('electron') : {};
-      const selectConfigBtn = document.getElementById('select-config-folder-btn');
-      selectConfigBtn.addEventListener('click', () => {
+      async function updateSteamIDAndConfigPath() {
         if (ipcRenderer) {
-          ipcRenderer.invoke('select-config-folder').then((folderPath) => {
-            if (folderPath) {
-              document.getElementById('config-path-value').textContent = folderPath;
-              showStatus('Config path updated!', '#0f0');
-            }
-          });
+          const result = await ipcRenderer.invoke('get-steamid-and-config-path');
+          if (result && result.steamid && result.configPath) {
+            document.getElementById('steamid-value').textContent = result.steamid;
+            document.getElementById('config-path-value').textContent = result.configPath + (result.manual ? ' (manual)' : '');
+          } else {
+            document.getElementById('steamid-value').textContent = 'N/A';
+            document.getElementById('config-path-value').textContent = 'N/A';
+            showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
+          }
+        } else {
+          showStatus('Electron IPC not available.', '#f00');
+        }
+      }
+      updateSteamIDAndConfigPath();
+      // Step 6: Manual Config Path Selection
+      const selectConfigBtn = document.getElementById('select-config-folder-btn');
+      selectConfigBtn.addEventListener('click', async () => {
+        if (ipcRenderer) {
+          const folderPath = await ipcRenderer.invoke('select-config-folder');
+          if (folderPath) {
+            // After persisting, re-fetch config info to update UI
+            updateSteamIDAndConfigPath();
+            showStatus('Config path updated and saved!', '#0f0');
+          }
         } else {
           showStatus('Folder selection not available in this environment.', '#f00');
+        }
+      });
+      // Change SteamID button logic
+      const changeSteamIDBtn = document.getElementById('change-steamid-btn');
+      changeSteamIDBtn.addEventListener('click', async () => {
+        if (ipcRenderer) {
+          const result = await ipcRenderer.invoke('get-steamid-and-config-path', { forceSelect: true });
+          if (result && result.steamid && result.configPath) {
+            document.getElementById('steamid-value').textContent = result.steamid;
+            document.getElementById('config-path-value').textContent = result.configPath;
+            showStatus('SteamID updated!', '#0af');
+          } else {
+            document.getElementById('steamid-value').textContent = 'N/A';
+            document.getElementById('config-path-value').textContent = 'N/A';
+            showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
+          }
         }
       });
       // Phase 7: Scheduling Section logic

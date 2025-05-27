@@ -5,6 +5,10 @@ const cheerio = require('cheerio');
 const got = gotImport.default ? gotImport.default : gotImport;
 const { URL } = require('url');
 const puppeteer = require('puppeteer');
+const fs = require('fs');
+const os = require('os');
+
+app.setName('d2pt-meta-hero-grid-updater');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -39,7 +43,18 @@ ipcMain.handle('select-config-folder', async (event) => {
   if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
     return null;
   }
+  // Persist the selected config path
+  let settings = loadPersistedSettings();
+  settings.manualConfigPath = result.filePaths[0];
+  savePersistedSettings(settings);
   return result.filePaths[0];
+});
+
+ipcMain.handle('clear-manual-config-path', async () => {
+  let settings = loadPersistedSettings();
+  delete settings.manualConfigPath;
+  savePersistedSettings(settings);
+  return { success: true };
 });
 
 ipcMain.handle('schedule-weekly-update', async (event, { day, time }) => {
@@ -98,6 +113,156 @@ ipcMain.handle('download-grid-json', async (event, gridType) => {
       throw new Error('Downloaded file is not valid JSON.');
     }
     return { success: true, json };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+// Phase 9: SteamID Detection, Selection, and Persistence
+const APP_DATA_PATH = app.getPath('userData');
+const PERSIST_FILE = path.join(APP_DATA_PATH, 'user-settings.json');
+const STEAM_USERDATA_PATH = 'C:\\Program Files (x86)\\Steam\\userdata';
+
+function loadPersistedSettings() {
+  try {
+    if (fs.existsSync(PERSIST_FILE)) {
+      return JSON.parse(fs.readFileSync(PERSIST_FILE, 'utf-8'));
+    }
+  } catch (e) {}
+  return {};
+}
+
+function savePersistedSettings(settings) {
+  try {
+    fs.writeFileSync(PERSIST_FILE, JSON.stringify(settings, null, 2), 'utf-8');
+  } catch (e) {}
+}
+
+async function detectSteamID(win, forceSelect = false) {
+  let settings = loadPersistedSettings();
+  let steamid = null;
+  try {
+    if (fs.existsSync(STEAM_USERDATA_PATH)) {
+      const dirs = fs.readdirSync(STEAM_USERDATA_PATH, { withFileTypes: true })
+        .filter(d => d.isDirectory() && /^\d+$/.test(d.name))
+        .map(d => d.name);
+      if (dirs.length === 1) {
+        steamid = dirs[0];
+      } else if (dirs.length > 1 && win) {
+        // Prompt user to select SteamID if forceSelect or no persisted steamid
+        if (forceSelect || !settings.steamid) {
+          const { response } = await dialog.showMessageBox(win, {
+            type: 'question',
+            buttons: dirs,
+            title: 'Select SteamID',
+            message: 'Multiple SteamIDs found. Please select your SteamID (the one with Dota 2 config).',
+            defaultId: 0,
+            cancelId: -1
+          });
+          if (response >= 0 && response < dirs.length) {
+            steamid = dirs[response];
+          }
+        } else {
+          steamid = settings.steamid;
+        }
+      }
+      if (steamid) {
+        settings.steamid = steamid;
+        savePersistedSettings(settings);
+        return steamid;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+function getConfigPath(steamid) {
+  return `C:\\Program Files (x86)\\Steam\\userdata\\${steamid}\\570\\remote\\cfg`;
+}
+
+ipcMain.handle('get-steamid-and-config-path', async (event, opts = {}) => {
+  const win = BrowserWindow.getFocusedWindow();
+  let forceSelect = opts.forceSelect || false;
+  let settings = loadPersistedSettings();
+  // If manual config path is set, use it
+  if (settings.manualConfigPath) {
+    return {
+      steamid: settings.steamid || null,
+      configPath: settings.manualConfigPath,
+      manual: true
+    };
+  }
+  let steamid = null;
+  if (!forceSelect && settings.steamid) {
+    steamid = settings.steamid;
+  } else {
+    steamid = await detectSteamID(win, forceSelect);
+  }
+  if (steamid) {
+    return {
+      steamid,
+      configPath: getConfigPath(steamid),
+      manual: false
+    };
+  } else {
+    return {
+      steamid: null,
+      configPath: null,
+      error: 'Could not detect SteamID. Please select config folder manually.'
+    };
+  }
+});
+
+// Argument parsing for --flush
+let args = process.argv;
+if (process.defaultApp) {
+  args = args.slice(2);
+} else {
+  args = args.slice(1);
+}
+
+// Flush user settings if --flush is passed
+if (args.includes('--flush')) {
+  try {
+    if (fs.existsSync(PERSIST_FILE)) {
+      fs.unlinkSync(PERSIST_FILE);
+    }
+  } catch (e) {
+    // Silently ignore errors
+  }
+}
+
+// Phase 11: Backup Existing Grid with Warning Logic
+ipcMain.handle('backup-hero-grid', async (event, { configPath, silent }) => {
+  const gridFile = path.join(configPath, 'hero_grid_config.json');
+  const backupFile = path.join(configPath, 'hero_grid_config_backup.json');
+  let settings = loadPersistedSettings();
+  let warned = settings.backupWarningShown;
+  let didBackup = false;
+  let warningShown = false;
+  try {
+    if (fs.existsSync(gridFile)) {
+      // Show warning only on first run, unless silent
+      if (!warned && !silent) {
+        const win = BrowserWindow.getFocusedWindow();
+        await dialog.showMessageBox(win, {
+          type: 'warning',
+          title: 'Backup Notice',
+          message: 'Your existing hero_grid_config.json will be backed up as hero_grid_config_backup.json. This backup will be overwritten each time you update.',
+          buttons: ['OK']
+        });
+        settings.backupWarningShown = true;
+        savePersistedSettings(settings);
+        warningShown = true;
+      }
+      // Overwrite backup if it exists
+      if (fs.existsSync(backupFile)) {
+        fs.unlinkSync(backupFile);
+      }
+      fs.renameSync(gridFile, backupFile);
+      didBackup = true;
+    }
+    return { success: true, didBackup, warningShown };
   } catch (err) {
     return { success: false, error: err.message };
   }

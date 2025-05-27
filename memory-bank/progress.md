@@ -52,4 +52,16 @@
 - Verify that the app window shows a SteamID and config path below the status area.
 - Confirm that the displayed values match the test values set in the script.
 
+## Step 6: UI Manual Config Path Selection (Completed)
+- Added a "Select Config Folder" button below the config path display in the UI (`index.html`).
+- When clicked, the button opens a native folder selection dialog using Electron's dialog module (handled in `main.js`).
+- When a folder is selected, the config path display in the UI updates to show the new path, and a status message is shown.
+- Communication between the renderer and main process is handled via Electron's IPC (`ipcRenderer` and `ipcMain`).
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Click the "Select Config Folder" button below the config path.
+- Select a folder in the dialog and confirm the config path display updates to the selected folder.
+- A green status message should appear confirming the update.
+
 ---

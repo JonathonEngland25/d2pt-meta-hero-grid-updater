@@ -12,5 +12,8 @@
 - `steamid-config-section` (in `index.html`): UI section below the status area. Displays the user's SteamID and Dota 2 config folder path. Initially uses test values, to be replaced by real detection logic in later steps.
 - `steamid-value` and `config-path-value` (in `index.html`): `<span>` elements within the new section that show the SteamID and config path. Their content is set via JavaScript.
 - Test value assignment (in `index.html` <script>): JavaScript code that sets the content of the above spans to test values for Step 5. This will later be replaced with actual detection logic.
+- `Select Config Folder` button (in `index.html`): UI button below the config path display. Allows the user to manually select the Dota 2 config folder if automatic detection is incorrect or fails.
+- Button click event handler (in `index.html` <script>): Uses Electron's `ipcRenderer` to invoke the 'select-config-folder' IPC channel, requesting the main process to open a folder selection dialog. Updates the config path display and shows a status message when a folder is selected.
+- `ipcMain.handle('select-config-folder', ...)` (in `main.js`): Handles the IPC request from the renderer. Opens a native folder selection dialog using Electron's `dialog` module and returns the selected folder path to the renderer process.
 
 ---

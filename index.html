@@ -36,6 +36,7 @@
     <div id="steamid-config-section" style="margin-bottom: 1rem;">
       <div>SteamID: <span id="steamid-value">123456789</span></div>
       <div>Config Path: <span id="config-path-value">C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg</span></div>
+      <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
     </div>
     <p>Placeholder UI - Step 3</p>
     <script>
@@ -66,6 +67,21 @@
       // Step 5: Set test values for SteamID and config path
       document.getElementById('steamid-value').textContent = '123456789';
       document.getElementById('config-path-value').textContent = 'C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg';
+      // Step 6: Manual Config Path Selection
+      const { ipcRenderer } = window.require ? window.require('electron') : {};
+      const selectConfigBtn = document.getElementById('select-config-folder-btn');
+      selectConfigBtn.addEventListener('click', () => {
+        if (ipcRenderer) {
+          ipcRenderer.invoke('select-config-folder').then((folderPath) => {
+            if (folderPath) {
+              document.getElementById('config-path-value').textContent = folderPath;
+              showStatus('Config path updated!', '#0f0');
+            }
+          });
+        } else {
+          showStatus('Folder selection not available in this environment.', '#f00');
+        }
+      });
     </script>
   </div>
 </body>

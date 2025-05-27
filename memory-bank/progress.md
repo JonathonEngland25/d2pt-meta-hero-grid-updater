@@ -85,4 +85,17 @@
   - A notification should appear.
   - The console should log the simulated removal.
 
+## Step 8: Download Grid Logic (Completed)
+- Implemented dynamic scraping of https://dota2protracker.com/meta-hero-grids using Puppeteer to handle JavaScript-rendered content.
+- The app now finds the correct download link for each grid type (Most Played, High Win Rate, D2PT Rating) by parsing the mode query parameter.
+- Downloads the selected grid's JSON and returns it to the renderer process.
+- UI now displays persistent success/failure messages in the status area.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Select a grid type and click "Download & Update".
+- Confirm that a success message and a snippet of the downloaded JSON appear in the status area.
+- Try all grid types to ensure each downloads correctly.
+- Confirm that error messages persist if a failure occurs.
+
 ---

@@ -18,5 +18,13 @@
 - `scheduling-section` (in `index.html`): UI section for scheduling weekly updates. Includes a day-of-week dropdown, time picker, "Schedule Weekly Update" button, "Remove/Modify Schedule" button, and a display for the current schedule status. Handles user input for scheduling and removal of weekly update tasks.
 - Scheduling logic (in `index.html` <script>): JavaScript code that listens for scheduling/removal actions, updates the UI state, and communicates with the main process via IPC.
 - `ipcMain.handle('schedule-weekly-update', ...)` and `ipcMain.handle('remove-weekly-schedule', ...)` (in `main.js`): IPC handlers that receive scheduling/removal requests from the renderer. Currently simulate scheduling/removal and return success. Will be extended in later phases to integrate with Windows Task Scheduler.
+- `puppeteer` (Node.js dependency): Used in the main process to launch a headless browser for scraping JavaScript-rendered content from dota2protracker.com/meta-hero-grids. Ensures download links are reliably found even if rendered client-side.
+- `download-grid-json` (IPC handler in `main.js`): Handles requests from the renderer to fetch the latest grid JSON for the selected type. Uses Puppeteer to scrape the page, finds the correct download link by matching the mode query parameter, downloads the JSON, and returns it to the renderer.
+- Status message logic (in `index.html`): The `showStatus` function now displays persistent success/failure messages in the status area, improving user feedback and testability.
+
+**File Purposes (Phase 8 additions):**
+- `main.js`: Contains the Electron main process, IPC handlers, and Puppeteer-based scraping logic for grid downloads.
+- `index.html`: Main UI, including grid selection, download button, and persistent status area for user feedback.
+- `package.json`: Now includes Puppeteer as a dependency for headless browser automation.
 
 ---

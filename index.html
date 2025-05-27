@@ -72,20 +72,29 @@
       // Step 3: Download & Update button click event
       const downloadBtn = document.getElementById('download-update-btn');
       const statusArea = document.getElementById('status-area');
-      downloadBtn.addEventListener('click', (e) => {
+      downloadBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        console.log('Download & Update button clicked');
-        // Step 4: Show test notification in status area
-        showStatus('Test notification: Download & Update triggered!');
+        const gridType = form.grid.value;
+        if (ipcRenderer) {
+          showStatus('Downloading grid...');
+          const result = await ipcRenderer.invoke('download-grid-json', gridType);
+          if (result.success) {
+            // For test: display a snippet of the JSON in the status area
+            showStatus('Download successful! Example: ' + JSON.stringify(result.json).slice(0, 100) + '...');
+            console.log('Downloaded grid JSON:', result.json);
+          } else {
+            showStatus('Download failed: ' + result.error, '#f00');
+            console.error('Download error:', result.error);
+          }
+        } else {
+          showStatus('Download not available in this environment.', '#f00');
+        }
       });
       // Step 4: Status area notification function
       function showStatus(message, color = '#0f0') {
         statusArea.textContent = message;
         statusArea.style.color = color;
-        // Optionally, clear after a few seconds
-        setTimeout(() => {
-          statusArea.textContent = '';
-        }, 4000);
+        // Removed auto-clear for persistent status messages
       }
       // Step 5: Set test values for SteamID and config path
       document.getElementById('steamid-value').textContent = '123456789';

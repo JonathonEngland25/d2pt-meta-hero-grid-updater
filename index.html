@@ -31,6 +31,12 @@
     </form>
     <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
     <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
+    <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
+    <!-- Step 5: SteamID & Config Path Display -->
+    <div id="steamid-config-section" style="margin-bottom: 1rem;">
+      <div>SteamID: <span id="steamid-value">123456789</span></div>
+      <div>Config Path: <span id="config-path-value">C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg</span></div>
+    </div>
     <p>Placeholder UI - Step 3</p>
     <script>
       const form = document.getElementById('grid-form');
@@ -41,10 +47,25 @@
       });
       // Step 3: Download & Update button click event
       const downloadBtn = document.getElementById('download-update-btn');
+      const statusArea = document.getElementById('status-area');
       downloadBtn.addEventListener('click', (e) => {
         e.preventDefault();
         console.log('Download & Update button clicked');
+        // Step 4: Show test notification in status area
+        showStatus('Test notification: Download & Update triggered!');
       });
+      // Step 4: Status area notification function
+      function showStatus(message, color = '#0f0') {
+        statusArea.textContent = message;
+        statusArea.style.color = color;
+        // Optionally, clear after a few seconds
+        setTimeout(() => {
+          statusArea.textContent = '';
+        }, 4000);
+      }
+      // Step 5: Set test values for SteamID and config path
+      document.getElementById('steamid-value').textContent = '123456789';
+      document.getElementById('config-path-value').textContent = 'C:\\Program Files (x86)\\Steam\\userdata\\123456789\\570\\remote\\cfg';
     </script>
   </div>
 </body>

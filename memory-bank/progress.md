@@ -31,4 +31,25 @@
 - Verify that the app window shows the "Download & Update" button below the grid selection.
 - Click the button and confirm that a message is logged to the console (open Developer Tools with Ctrl+Shift+I to view the console).
 
+## Step 4: UI Status Area (Completed)
+- Added a status area below the "Download & Update" button in the UI (`index.html`).
+- Implemented a function to display notifications and operation results in the status area.
+- When the button is clicked, a test notification appears in the status area and disappears after a few seconds.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Click the "Download & Update" button.
+- Verify that a green notification appears in the status area and then disappears after a few seconds.
+
+## Step 5: UI SteamID & Config Path Display (Completed)
+- Added a new section below the status area in `index.html` to display the detected SteamID and config folder path.
+- For this step, test values are hardcoded in the UI and set via JavaScript for demonstration purposes.
+- The section includes two lines: one for SteamID and one for the config path, both using placeholder values.
+- This prepares the UI for future integration with real detection logic in later steps.
+
+**How to test:**
+- Run `npm start` in the project directory.
+- Verify that the app window shows a SteamID and config path below the status area.
+- Confirm that the displayed values match the test values set in the script.
+
 ---

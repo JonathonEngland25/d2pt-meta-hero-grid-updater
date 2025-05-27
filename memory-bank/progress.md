@@ -64,28 +64,7 @@
 - Select a folder in the dialog and confirm the config path display updates to the selected folder.
 - A green status message should appear confirming the update.
 
-## Step 7: UI Scheduling Section (Completed)
-- Added a new section to the UI for scheduling weekly updates, including:
-  - Day-of-week dropdown
-  - Time picker
-  - "Schedule Weekly Update" button
-  - "Remove/Modify Schedule" button
-  - Display of current schedule status
-- Implemented renderer logic to handle scheduling/removal actions and update UI state.
-- Added IPC communication to main process for scheduling/removal (simulated for now).
-
-**How to test:**
-- Run `npm start` in the project directory.
-- In the app, set a day and time, then click "Schedule Weekly Update".
-  - The status should update to show the scheduled day/time.
-  - A notification should appear.
-  - The console should log the simulated scheduling.
-- Click "Remove/Modify Schedule".
-  - The status should reset to "No schedule set."
-  - A notification should appear.
-  - The console should log the simulated removal.
-
-## Step 8: Download Grid Logic (Completed)
+## Step 7: Download Grid Logic (Completed)
 - Implemented dynamic scraping of https://dota2protracker.com/meta-hero-grids using Puppeteer to handle JavaScript-rendered content.
 - The app now finds the correct download link for each grid type (Most Played, High Win Rate, D2PT Rating) by parsing the mode query parameter.
 - Downloads the selected grid's JSON and returns it to the renderer process.
@@ -98,7 +77,7 @@
 - Try all grid types to ensure each downloads correctly.
 - Confirm that error messages persist if a failure occurs.
 
-## Step 9: SteamID Detection, Selection, and Persistence (Completed)
+## Step 8: SteamID Detection, Selection, and Persistence (Completed)
 - Implemented logic to scan the Steam userdata directory for SteamIDs.
 - If only one SteamID is found, it is used automatically.
 - If multiple SteamIDs are found, the user is prompted to select one via a dialog.
@@ -112,7 +91,7 @@
 - Click the "Change SteamID" button in the UI to re-select your SteamID at any time.
 - Run `npm start -- --flush` to delete all user settings. The app should prompt for SteamID selection again on next launch.
 
-## Step 10: Config Path Construction and Persistence (Completed)
+## Step 9: Config Path Construction and Persistence (Completed)
 - Updated the app to persist the manually selected config path in user-settings.json.
 - When the user selects a config folder, the path is saved and used for future launches.
 - On app launch, if a manual config path is set, it is displayed in the UI (with a '(manual)' indicator) and used for all operations.
@@ -126,9 +105,9 @@
 - Restart the app and verify the manual path persists.
 - Optionally, clear the manual path (feature for future) and confirm the app returns to automatic detection.
 
-## Step 11: Backup Existing Grid with Warning Logic (Completed)
+## Step 10: Backup Existing Grid with Warning Logic (Completed)
 - Implemented logic in the main process (main.js) to back up the existing hero_grid_config.json as hero_grid_config_backup.json before replacing it.
-- On the first run, the app shows a warning dialog to inform the user that the backup will be overwritten on each update. This warning is only shown once (unless running in silent/background mode).
+- On the first run, the app shows a warning dialog to inform the user that the backup will be overwritten on each update. This warning is only shown once.
 - The backup step is now triggered from the UI before downloading and replacing the grid.
 - Status messages are shown in the UI for backup and download steps.
 
@@ -139,7 +118,7 @@
 - On subsequent runs, confirm the backup is silently overwritten and no warning is shown.
 - If no grid exists, confirm the app proceeds to download without backup or warning.
 
-## Step 12: Replace Grid (Completed)
+## Step 11: Replace Grid (Completed)
 - Implemented logic to save the downloaded grid JSON as `hero_grid_config.json` in the config folder after backup and download steps.
 - Added a new IPC handler (`replace-hero-grid`) in `main.js` that writes the JSON to the correct file.
 - Updated the renderer logic in `index.html` to call this handler after a successful download, and to show a status message for success or failure.
@@ -150,10 +129,10 @@
 - Confirm that after backup and download, the new `hero_grid_config.json` file is created/overwritten in the config folder with the correct content.
 - Check the status area for a success or error message after the update step.
 
-## Step 13: Notifications and Windows Notifications Option (Completed)
+## Step 12: Notifications and Windows Notifications Option (Completed)
 - Added logic to display success or failure notifications for download, backup, and replace steps in the status area.
 - Added an option in the UI (checkbox) to enable Windows notifications for these events.
-- When enabled, the app uses Electron's Notification API to show native Windows notifications for download, backup, and replace events (success or failure), including in silent/background mode.
+- When enabled, the app uses Electron's Notification API to show native Windows notifications for download, backup, and replace events (success or failure).
 - The notification setting is persisted in user-settings.json and can be toggled from the UI.
 
 **How to test:**
@@ -163,7 +142,7 @@
 - Disable the checkbox and confirm notifications no longer appear.
 - Confirm that status area notifications always appear regardless of the Windows notification setting.
 
-## Step 14: Manual Override for Config Path (Persistent) (Completed)
+## Step 13: Manual Override for Config Path (Persistent) (Completed)
 - Fixed a bug where the app did not detect when the Steam directory or config path was missing or renamed at startup.
 - Now, after detecting the config path (either via SteamID or manual override), the app checks if the path actually exists.
 - If the config path does not exist, the app returns an error and prompts the user to select the config folder via a native dialog.

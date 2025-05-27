@@ -15,7 +15,6 @@ A lightweight desktop application to automate the process of downloading the lat
 - Ensure user data safety by backing up existing configurations.
 - Provide a clean, intuitive, and minimal user interface.
 - Automatically detect the user's SteamID for a seamless experience.
-- Allow users to schedule automatic weekly updates using Windows Task Scheduler.
 
 ---
 
@@ -26,8 +25,6 @@ A lightweight desktop application to automate the process of downloading the lat
 - **As a user**, I want the app to automatically back up my current hero grid before making changes.
 - **As a user**, I want the app to replace my current hero grid with the downloaded one.
 - **As a user**, I want to be notified of success or failure at each step.
-- **As a user**, I want to schedule the app to update my hero grid automatically every week.
-- **As a user**, I want to be able to cancel or change the schedule from within the app.
 
 ---
 
@@ -60,13 +57,6 @@ A lightweight desktop application to automate the process of downloading the lat
 7. **Manual Override**
    - Allow the user to manually select the config folder if automatic detection fails.
 
-8. **Windows Task Scheduler Integration**
-   - The app provides an option in the UI: "Schedule Weekly Update."
-   - When selected, the app creates a scheduled task using Windows Task Scheduler to run the updater weekly at a user-specified day and time.
-   - The app supports a "silent" or "background" mode (e.g., `YourApp.exe --silent`) so it can run without user interaction when scheduled.
-   - The app provides options to view, modify, or remove the scheduled task from within the app.
-   - The app notifies the user of the status of scheduling actions (success, failure, next scheduled run).
-
 ---
 
 ## Non-Functional Requirements
@@ -86,11 +76,6 @@ A lightweight desktop application to automate the process of downloading the lat
   - Status area for notifications.
   - Display of detected SteamID and config path.
   - Option to change the config folder path if needed.
-  - **Scheduling Section:**
-    - Button: "Schedule Weekly Update"
-    - Day/time picker for scheduling
-    - Display of current schedule status (next run, enabled/disabled)
-    - Button to remove or modify the schedule
 
 ---
 
@@ -100,7 +85,6 @@ A lightweight desktop application to automate the process of downloading the lat
 - If multiple SteamIDs are found, prompt the user to choose.
 - If download fails, show an error and allow retry.
 - If backup or file operations fail, show a clear error message.
-- If scheduling fails, show a clear error message and troubleshooting tips.
 
 ---
 

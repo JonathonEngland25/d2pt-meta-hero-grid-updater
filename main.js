@@ -57,18 +57,6 @@ ipcMain.handle('clear-manual-config-path', async () => {
   return { success: true };
 });
 
-ipcMain.handle('schedule-weekly-update', async (event, { day, time }) => {
-  console.log(`Simulating scheduling: Weekly update on ${day} at ${time}`);
-  // Simulate success
-  return { success: true };
-});
-
-ipcMain.handle('remove-weekly-schedule', async (event) => {
-  console.log('Simulating removal of scheduled weekly update');
-  // Simulate success
-  return { success: true };
-});
-
 // Phase 8: Download Grid Logic
 const GRID_TYPE_TO_MODE = {
   'Most Played': 'matches',

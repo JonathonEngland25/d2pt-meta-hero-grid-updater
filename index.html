@@ -45,29 +45,6 @@
       <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
       <button id="change-steamid-btn" style="margin-top: 0.5em; margin-left: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Change SteamID</button>
     </div>
-    <!-- Phase 7: Scheduling Section -->
-    <div id="scheduling-section" style="margin-bottom: 1.5rem; border: 1px solid #444; padding: 1em; border-radius: 8px; background: #292929; max-width: 400px; margin-left: auto; margin-right: auto;">
-      <h2 style="font-size: 1.1rem; margin-bottom: 0.5em;">Schedule Weekly Update</h2>
-      <form id="schedule-form" style="display: flex; flex-direction: column; align-items: center; gap: 0.5em;">
-        <label>Day:
-          <select id="schedule-day">
-            <option value="Sunday">Sunday</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-          </select>
-        </label>
-        <label>Time:
-          <input type="time" id="schedule-time" value="12:00">
-        </label>
-        <button id="schedule-btn" type="button" style="padding: 0.4em 1.2em; font-size: 1rem; cursor: pointer;">Schedule Weekly Update</button>
-        <button id="remove-schedule-btn" type="button" style="padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer; background: #a33; color: #fff;">Remove/Modify Schedule</button>
-      </form>
-      <div id="schedule-status" style="margin-top: 0.7em; color: #0af; font-size: 0.98rem;">No schedule set.</div>
-    </div>
     <p>Placeholder UI - Step 3</p>
     <script>
       const form = document.getElementById('grid-form');
@@ -183,42 +160,6 @@
             document.getElementById('config-path-value').textContent = 'N/A';
             showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
           }
-        }
-      });
-      // Phase 7: Scheduling Section logic
-      const scheduleBtn = document.getElementById('schedule-btn');
-      const removeScheduleBtn = document.getElementById('remove-schedule-btn');
-      const scheduleDay = document.getElementById('schedule-day');
-      const scheduleTime = document.getElementById('schedule-time');
-      const scheduleStatus = document.getElementById('schedule-status');
-      scheduleBtn.addEventListener('click', () => {
-        const day = scheduleDay.value;
-        const time = scheduleTime.value;
-        if (ipcRenderer) {
-          ipcRenderer.invoke('schedule-weekly-update', { day, time }).then((result) => {
-            if (result && result.success) {
-              scheduleStatus.textContent = `Scheduled for ${day} at ${time}`;
-              showStatus('Weekly update scheduled!', '#0af');
-            } else {
-              showStatus('Failed to schedule update.', '#f00');
-            }
-          });
-        } else {
-          showStatus('Scheduling not available in this environment.', '#f00');
-        }
-      });
-      removeScheduleBtn.addEventListener('click', () => {
-        if (ipcRenderer) {
-          ipcRenderer.invoke('remove-weekly-schedule').then((result) => {
-            if (result && result.success) {
-              scheduleStatus.textContent = 'No schedule set.';
-              showStatus('Schedule removed.', '#0af');
-            } else {
-              showStatus('Failed to remove schedule.', '#f00');
-            }
-          });
-        } else {
-          showStatus('Remove schedule not available in this environment.', '#f00');
         }
       });
       // Phase 13: Windows Notifications Option

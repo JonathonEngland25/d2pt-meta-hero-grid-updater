@@ -68,6 +68,8 @@
 4. Status area notifications in the UI are always shown, regardless of the Windows notification setting.
 
 **File Purposes (Phase 14 additions):**
+- `main.js`: Now includes a `logError` helper function that logs all errors from IPC handlers and utility functions to `error.log` in the app's user data directory. All major error scenarios (config detection, download, backup, replace, etc.) are logged with timestamp, context, message, and stack trace.
+- `error.log`: Stores all error logs for the app. Each entry includes a timestamp, error context, message, and stack trace if available. Useful for debugging and support.
 - `main.js`: The `get-steamid-and-config-path` IPC handler now checks if the detected config path (via SteamID or manual override) actually exists. If not, it returns an error and does not return a config path. This ensures the app never operates on a missing or invalid directory.
 - `index.html`: The renderer listens for errors from `get-steamid-and-config-path`. If the config path is missing or invalid, the UI automatically opens the folder selection dialog, prompting the user to select a valid config folder. This prevents the user from proceeding without a valid path and streamlines recovery from missing/renamed directories.
 - `user-settings.json`: Continues to persist the manual config path if set. If the manual path is missing, the app prompts the user to select a new one at startup.
@@ -77,5 +79,8 @@
 2. If the path is missing or invalid, the user is immediately prompted to select a folder.
 3. The selected path is persisted and used for all future operations.
 4. This ensures robust handling of missing/renamed Steam or config directories and a seamless user experience.
+5. Any error in the main process (e.g., config not found, download failure, file operation error) is logged to `error.log` via the `logError` helper.
+6. The user is shown a clear error message in the status area and, if enabled, as a Windows notification.
+7. Developers and users can inspect `error.log` in the user data directory for troubleshooting and support.
 
 ---

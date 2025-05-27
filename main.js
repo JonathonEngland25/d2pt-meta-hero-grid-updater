@@ -64,6 +64,17 @@ const GRID_TYPE_TO_MODE = {
   'D2PT Rating': 'd2ptrating',
 };
 
+const ERROR_LOG_FILE = path.join(app.getPath('userData'), 'error.log');
+function logError(context, err) {
+  const timestamp = new Date().toISOString();
+  const message = `[${timestamp}] [${context}] ${err && err.message ? err.message : err}\n${err && err.stack ? err.stack : ''}\n`;
+  try {
+    fs.appendFileSync(ERROR_LOG_FILE, message, 'utf-8');
+  } catch (e) {
+    // If logging fails, there's not much we can do
+  }
+}
+
 ipcMain.handle('download-grid-json', async (event, gridType) => {
   try {
     const url = 'https://dota2protracker.com/meta-hero-grids';
@@ -103,6 +114,7 @@ ipcMain.handle('download-grid-json', async (event, gridType) => {
     maybeNotify('Download Successful', `Grid JSON for ${gridType} downloaded.`);
     return { success: true, json };
   } catch (err) {
+    logError('download-grid-json', err);
     maybeNotify('Download Failed', err.message);
     return { success: false, error: err.message };
   }
@@ -139,7 +151,6 @@ async function detectSteamID(win, forceSelect = false) {
       if (dirs.length === 1) {
         steamid = dirs[0];
       } else if (dirs.length > 1 && win) {
-        // Prompt user to select SteamID if forceSelect or no persisted steamid
         if (forceSelect || !settings.steamid) {
           const { response } = await dialog.showMessageBox(win, {
             type: 'question',
@@ -162,7 +173,9 @@ async function detectSteamID(win, forceSelect = false) {
         return steamid;
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    logError('detectSteamID', e);
+  }
   return null;
 }
 
@@ -174,51 +187,64 @@ ipcMain.handle('get-steamid-and-config-path', async (event, opts = {}) => {
   const win = BrowserWindow.getFocusedWindow();
   let forceSelect = opts.forceSelect || false;
   let settings = loadPersistedSettings();
-  // If manual config path is set, use it
-  if (settings.manualConfigPath) {
-    // Check if manual config path exists
-    if (fs.existsSync(settings.manualConfigPath)) {
-      return {
-        steamid: settings.steamid || null,
-        configPath: settings.manualConfigPath,
-        manual: true
-      };
+  try {
+    if (settings.manualConfigPath) {
+      if (fs.existsSync(settings.manualConfigPath)) {
+        return {
+          steamid: settings.steamid || null,
+          configPath: settings.manualConfigPath,
+          manual: true
+        };
+      } else {
+        const errorMsg = 'Manual config path does not exist. Please select your config folder again.';
+        logError('get-steamid-and-config-path', new Error(errorMsg));
+        return {
+          steamid: settings.steamid || null,
+          configPath: null,
+          manual: true,
+          error: errorMsg
+        };
+      }
+    }
+    let steamid = null;
+    if (!forceSelect && settings.steamid) {
+      steamid = settings.steamid;
     } else {
+      steamid = await detectSteamID(win, forceSelect);
+    }
+    if (steamid) {
+      const configPath = getConfigPath(steamid);
+      if (fs.existsSync(configPath)) {
+        return {
+          steamid,
+          configPath,
+          manual: false
+        };
+      } else {
+        const errorMsg = 'Detected config path does not exist. Please select your config folder.';
+        logError('get-steamid-and-config-path', new Error(errorMsg));
+        return {
+          steamid,
+          configPath: null,
+          manual: false,
+          error: errorMsg
+        };
+      }
+    } else {
+      const errorMsg = 'Could not detect SteamID. Please select config folder manually.';
+      logError('get-steamid-and-config-path', new Error(errorMsg));
       return {
-        steamid: settings.steamid || null,
+        steamid: null,
         configPath: null,
-        manual: true,
-        error: 'Manual config path does not exist. Please select your config folder again.'
+        error: errorMsg
       };
     }
-  }
-  let steamid = null;
-  if (!forceSelect && settings.steamid) {
-    steamid = settings.steamid;
-  } else {
-    steamid = await detectSteamID(win, forceSelect);
-  }
-  if (steamid) {
-    const configPath = getConfigPath(steamid);
-    if (fs.existsSync(configPath)) {
-      return {
-        steamid,
-        configPath,
-        manual: false
-      };
-    } else {
-      return {
-        steamid,
-        configPath: null,
-        manual: false,
-        error: 'Detected config path does not exist. Please select your config folder.'
-      };
-    }
-  } else {
+  } catch (err) {
+    logError('get-steamid-and-config-path', err);
     return {
       steamid: null,
       configPath: null,
-      error: 'Could not detect SteamID. Please select config folder manually.'
+      error: 'Unexpected error during SteamID/config detection.'
     };
   }
 });
@@ -275,6 +301,7 @@ ipcMain.handle('backup-hero-grid', async (event, { configPath, silent }) => {
     }
     return { success: true, didBackup, warningShown };
   } catch (err) {
+    logError('backup-hero-grid', err);
     maybeNotify('Backup Failed', err.message);
     return { success: false, error: err.message };
   }
@@ -288,6 +315,7 @@ ipcMain.handle('replace-hero-grid', async (event, { configPath, json }) => {
     maybeNotify('Grid Updated', 'hero_grid_config.json updated successfully.');
     return { success: true };
   } catch (err) {
+    logError('replace-hero-grid', err);
     maybeNotify('Update Failed', err.message);
     return { success: false, error: err.message };
   }

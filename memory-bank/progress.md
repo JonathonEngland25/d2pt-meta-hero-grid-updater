@@ -155,4 +155,15 @@
 - The app should immediately prompt you to select the config folder.
 - Select a folder and confirm it persists across restarts and is used for all operations.
 
+## Step 14: Error Handling and Logging (Completed)
+- Implemented robust error handling for all major failure scenarios: config folder not found, multiple SteamIDs, download failure, and file operation failure (backup, replace, etc.).
+- All errors are now logged to `error.log` in the app's user data directory. Each log entry includes a timestamp, error context, message, and stack trace if available.
+- User-facing error messages are shown in the status area and, if enabled, as Windows notifications.
+- Added a `logError` helper in `main.js` to centralize error logging from all IPC handlers and utility functions.
+
+**How to test:**
+- Simulate each error scenario (e.g., rename/remove config folder, cause download failure, file permission issues).
+- Verify the user sees a clear error message in the UI/status area and/or Windows notification.
+- Check that `error.log` in the user data directory contains a detailed log entry for each error.
+
 ---

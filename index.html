@@ -15,6 +15,12 @@
 <body>
   <div class="container">
     <h1>Dota 2 Meta Hero Grid Updater</h1>
+    <p style="max-width: 540px; margin: 0 auto 1.2em auto; color: #b0b8c1; font-size: 1.08rem; line-height: 1.5;">
+      Instantly update your Dota 2 hero grid with the latest meta picks.
+    </p>
+    <div style="max-width: 540px; margin: 0 auto 2em auto; color: #888fa3; font-size: 0.95rem;">
+      Data from <a href="https://dota2protracker.com/" target="_blank" rel="noopener" style="color: #8ab4f8; text-decoration: underline;">dota2protracker.com</a>
+    </div>
     <!-- No Config Info Card -->
     <div id="no-config-card" style="display:none; max-width: 480px; margin: 0 auto 2rem auto; background: #23272f; border: 2px dashed #444; border-radius: 1.2em; box-shadow: 0 4px 32px #0008; padding: 2.2em 2em 1.5em 2em; text-align: center; position: relative;">
       <div style="display: flex; justify-content: center; margin-bottom: 1.2em;">
@@ -77,16 +83,16 @@
         </div>
       </div>
       <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
-      <!-- Phase 13: Windows Notifications Option -->
-      <div style="margin-bottom: 1rem;">
-        <label>
-          <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
-        </label>
-      </div>
       <!-- Step 5: SteamID & Config Path Display -->
-      <div id="config-section" style="margin-bottom: 1rem;">
-        <div>Config Path: <span id="config-path-value">N/A</span></div>
-        <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
+      <div id="config-section" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+        <div style="background: #23272f; border-radius: 0.9em; box-shadow: 0 2px 12px #0005; padding: 1.1em 1.5em; display: flex; align-items: center; gap: 1.1em; min-width: 0; max-width: 420px; width: 100%;">
+          <div style="display: flex; align-items: center;">
+            <!-- Folder Icon -->
+            <svg width="22" height="22" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-right: 0.7em;"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+            <span style="color: #b0b8c1; font-size: 1.01em; word-break: break-all; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="config-path-value">N/A</span>
+          </div>
+          <button id="select-config-folder-btn" style="background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); color: #fff; border: none; border-radius: 0.6em; font-size: 1.01rem; font-weight: 500; padding: 0.5em 1.4em; cursor: pointer; box-shadow: 0 2px 8px #0003; transition: background 0.2s; margin-left: auto;">Change</button>
+        </div>
       </div>
     </div>
     <!-- End Main App Content -->
@@ -147,21 +153,6 @@
             }
           });
         }
-        // Phase 13: Windows Notifications Option
-        const notifyCheckbox = document.getElementById('windows-notify-checkbox');
-        async function updateNotifyCheckbox() {
-          if (ipcRenderer) {
-            const result = await ipcRenderer.invoke('get-notification-setting');
-            notifyCheckbox.checked = !!(result && result.enabled);
-          }
-        }
-        notifyCheckbox.addEventListener('change', async () => {
-          if (ipcRenderer) {
-            await ipcRenderer.invoke('set-notification-setting', notifyCheckbox.checked);
-            showStatus('Windows notifications ' + (notifyCheckbox.checked ? 'enabled!' : 'disabled!'), '#0af');
-          }
-        });
-        updateNotifyCheckbox();
         // Card download logic
         document.querySelectorAll('.download-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {

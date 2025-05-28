@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=800, initial-scale=1.0">
+  <title>Preferences - Dota 2 Meta Hero Grid Updater</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: #222; color: #fff; }
+    .container { text-align: center; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    label { display: block; margin: 1em 0 0.5em 0; }
+    input[type="text"] { width: 60%; padding: 0.5em; }
+    select { padding: 0.5em; }
+    button { margin-top: 2em; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer; }
+    .setting-group { margin-bottom: 1.5em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Preferences</h1>
+    <form id="preferences-form">
+      <div class="setting-group">
+        <label for="close-action-select">On window close:</label>
+        <select id="close-action-select">
+          <option value="ask">Ask every time</option>
+          <option value="minimize">Minimize to tray</option>
+          <option value="exit">Exit application</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label>
+          <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
+        </label>
+      </div>
+      <div class="setting-group">
+        <label for="config-path-input">Dota 2 Config Path:</label>
+        <input type="text" id="config-path-input" readonly>
+        <button type="button" id="select-config-folder-btn">Change...</button>
+      </div>
+      <button type="button" id="back-btn">Back to Main</button>
+      <div id="status-area" style="min-height: 2em; margin-top: 1em; color: #0f0; font-weight: bold;"></div>
+    </form>
+  </div>
+  <script>
+    const { ipcRenderer } = window.require ? window.require('electron') : {};
+    const closeActionSelect = document.getElementById('close-action-select');
+    const notifyCheckbox = document.getElementById('windows-notify-checkbox');
+    const configPathInput = document.getElementById('config-path-input');
+    const selectConfigBtn = document.getElementById('select-config-folder-btn');
+    const backBtn = document.getElementById('back-btn');
+    const statusArea = document.getElementById('status-area');
+
+    function showStatus(message, color = '#0f0') {
+      statusArea.textContent = message;
+      statusArea.style.color = color;
+    }
+
+    async function loadSettings() {
+      if (ipcRenderer) {
+        // Get close action
+        const closeAction = await ipcRenderer.invoke('get-close-action-setting');
+        closeActionSelect.value = closeAction || 'ask';
+        // Get notification setting
+        const notifyResult = await ipcRenderer.invoke('get-notification-setting');
+        notifyCheckbox.checked = !!(notifyResult && notifyResult.enabled);
+        // Get config path
+        const configResult = await ipcRenderer.invoke('get-config-path');
+        configPathInput.value = (configResult && configResult.configPath) || '';
+      }
+    }
+
+    closeActionSelect.addEventListener('change', async () => {
+      if (ipcRenderer) {
+        await ipcRenderer.invoke('set-close-action-setting', closeActionSelect.value);
+        showStatus('Close action preference saved!', '#0af');
+      }
+    });
+
+    notifyCheckbox.addEventListener('change', async () => {
+      if (ipcRenderer) {
+        await ipcRenderer.invoke('set-notification-setting', notifyCheckbox.checked);
+        showStatus('Windows notifications ' + (notifyCheckbox.checked ? 'enabled!' : 'disabled!'), '#0af');
+      }
+    });
+
+    selectConfigBtn.addEventListener('click', async () => {
+      if (ipcRenderer) {
+        const folderPath = await ipcRenderer.invoke('select-config-folder');
+        if (folderPath) {
+          configPathInput.value = folderPath;
+          showStatus('Config path updated and saved!', '#0f0');
+        }
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    loadSettings();
+  </script>
+</body>
+</html> 

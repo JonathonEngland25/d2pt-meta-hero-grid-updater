@@ -1,12 +1,10 @@
 const { app, BrowserWindow, dialog, ipcMain, Notification, Tray, Menu } = require('electron');
 const path = require('path');
 const gotImport = require('got');
-const cheerio = require('cheerio');
 const got = gotImport.default ? gotImport.default : gotImport;
 const { URL } = require('url');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const os = require('os');
 
 app.setName('d2pt-meta-hero-grid-updater');
 
@@ -24,11 +22,40 @@ function createWindow() {
   });
   mainWindow.loadFile('index.html');
 
-  // Minimize to tray on close
-  mainWindow.on('close', (event) => {
+  // Minimize to tray or exit on close with confirmation dialog or persisted preference
+  mainWindow.on('close', async (event) => {
     if (!app.isQuiting) {
-      event.preventDefault();
-      mainWindow.hide();
+      let settings = loadPersistedSettings();
+      const closeAction = settings.closeAction || 'ask';
+      if (closeAction === 'minimize') {
+        event.preventDefault();
+        mainWindow.hide();
+        return false;
+      } else if (closeAction === 'exit') {
+        app.isQuiting = true;
+        app.quit();
+        return false;
+      } else {
+        event.preventDefault();
+        const win = mainWindow;
+        const result = await dialog.showMessageBox(win, {
+          type: 'question',
+          title: 'Close Application',
+          message: 'Do you want to minimize the app to the system tray or exit completely?',
+          detail: 'You can restore the app from the tray icon at any time.',
+          buttons: ['Minimize to Tray', 'Exit', 'Cancel'],
+          defaultId: 0,
+          cancelId: 2,
+          noLink: true
+        });
+        if (result.response === 0) { // Minimize to Tray
+          mainWindow.hide();
+        } else if (result.response === 1) { // Exit
+          app.isQuiting = true;
+          app.quit();
+        } // else Cancel: do nothing
+        return false;
+      }
     }
     return false;
   });
@@ -42,12 +69,34 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
+
+  // Add application menu with File > Preferences
+  const isMac = process.platform === 'darwin';
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Preferences',
+          accelerator: isMac ? 'Cmd+,' : 'Ctrl+,',
+          click: () => {
+            if (mainWindow) {
+              mainWindow.loadFile('preferences.html');
+            }
+          }
+        },
+        { type: 'separator' },
+        { role: isMac ? 'close' : 'quit' }
+      ]
+    }
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
   // Tray support
   if (!tray) {
-    // Use Electron's default icon if no custom icon is available
-    const iconPath = process.platform === 'win32'
-      ? path.join(__dirname, 'icon.ico')
-      : path.join(__dirname, 'icon.png');
+    // Always use icon.ico for the tray icon
+    const iconPath = path.join(__dirname, 'icon.ico');
     tray = new Tray(iconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
@@ -95,16 +144,26 @@ app.on('activate', () => {
   }
 });
 
+ipcMain.handle('get-config-path', async (event) => {
+  let settings = loadPersistedSettings();
+  if (settings.configPath && fs.existsSync(settings.configPath)) {
+    return { configPath: settings.configPath };
+  } else {
+    return { configPath: null };
+  }
+});
+
 ipcMain.handle('select-config-folder', async (event) => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openDirectory']
+  const win = BrowserWindow.getFocusedWindow();
+  const result = await dialog.showOpenDialog(win, {
+    properties: ['openDirectory'],
+    title: 'Select Dota 2 Config Folder'
   });
-  if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+  if (result.canceled || !result.filePaths || !result.filePaths[0]) {
     return null;
   }
-  // Persist the selected config path
   let settings = loadPersistedSettings();
-  settings.manualConfigPath = result.filePaths[0];
+  settings.configPath = result.filePaths[0];
   savePersistedSettings(settings);
   return result.filePaths[0];
 });
@@ -182,7 +241,6 @@ ipcMain.handle('download-grid-json', async (event, gridType) => {
 // Phase 9: SteamID Detection, Selection, and Persistence
 const APP_DATA_PATH = app.getPath('userData');
 const PERSIST_FILE = path.join(APP_DATA_PATH, 'user-settings.json');
-const STEAM_USERDATA_PATH = 'C:\\Program Files (x86)\\Steam\\userdata';
 
 function loadPersistedSettings() {
   try {
@@ -198,115 +256,6 @@ function savePersistedSettings(settings) {
     fs.writeFileSync(PERSIST_FILE, JSON.stringify(settings, null, 2), 'utf-8');
   } catch (e) {}
 }
-
-async function detectSteamID(win, forceSelect = false) {
-  let settings = loadPersistedSettings();
-  let steamid = null;
-  try {
-    if (fs.existsSync(STEAM_USERDATA_PATH)) {
-      const dirs = fs.readdirSync(STEAM_USERDATA_PATH, { withFileTypes: true })
-        .filter(d => d.isDirectory() && /^\d+$/.test(d.name))
-        .map(d => d.name);
-      if (dirs.length === 1) {
-        steamid = dirs[0];
-      } else if (dirs.length > 1 && win) {
-        if (forceSelect || !settings.steamid) {
-          const { response } = await dialog.showMessageBox(win, {
-            type: 'question',
-            buttons: dirs,
-            title: 'Select SteamID',
-            message: 'Multiple SteamIDs found. Please select your SteamID (the one with Dota 2 config).',
-            defaultId: 0,
-            cancelId: -1
-          });
-          if (response >= 0 && response < dirs.length) {
-            steamid = dirs[response];
-          }
-        } else {
-          steamid = settings.steamid;
-        }
-      }
-      if (steamid) {
-        settings.steamid = steamid;
-        savePersistedSettings(settings);
-        return steamid;
-      }
-    }
-  } catch (e) {
-    logError('detectSteamID', e);
-  }
-  return null;
-}
-
-function getConfigPath(steamid) {
-  return `C:\\Program Files (x86)\\Steam\\userdata\\${steamid}\\570\\remote\\cfg`;
-}
-
-ipcMain.handle('get-steamid-and-config-path', async (event, opts = {}) => {
-  const win = BrowserWindow.getFocusedWindow();
-  let forceSelect = opts.forceSelect || false;
-  let settings = loadPersistedSettings();
-  try {
-    if (settings.manualConfigPath) {
-      if (fs.existsSync(settings.manualConfigPath)) {
-        return {
-          steamid: settings.steamid || null,
-          configPath: settings.manualConfigPath,
-          manual: true
-        };
-      } else {
-        const errorMsg = 'Manual config path does not exist. Please select your config folder again.';
-        logError('get-steamid-and-config-path', new Error(errorMsg));
-        return {
-          steamid: settings.steamid || null,
-          configPath: null,
-          manual: true,
-          error: errorMsg
-        };
-      }
-    }
-    let steamid = null;
-    if (!forceSelect && settings.steamid) {
-      steamid = settings.steamid;
-    } else {
-      steamid = await detectSteamID(win, forceSelect);
-    }
-    if (steamid) {
-      const configPath = getConfigPath(steamid);
-      if (fs.existsSync(configPath)) {
-        return {
-          steamid,
-          configPath,
-          manual: false
-        };
-      } else {
-        const errorMsg = 'Detected config path does not exist. Please select your config folder.';
-        logError('get-steamid-and-config-path', new Error(errorMsg));
-        return {
-          steamid,
-          configPath: null,
-          manual: false,
-          error: errorMsg
-        };
-      }
-    } else {
-      const errorMsg = 'Could not detect SteamID. Please select config folder manually.';
-      logError('get-steamid-and-config-path', new Error(errorMsg));
-      return {
-        steamid: null,
-        configPath: null,
-        error: errorMsg
-      };
-    }
-  } catch (err) {
-    logError('get-steamid-and-config-path', err);
-    return {
-      steamid: null,
-      configPath: null,
-      error: 'Unexpected error during SteamID/config detection.'
-    };
-  }
-});
 
 // Argument parsing for --flush
 let args = process.argv;
@@ -399,6 +348,18 @@ ipcMain.handle('get-notification-setting', async () => {
 ipcMain.handle('set-notification-setting', async (event, enabled) => {
   let settings = loadPersistedSettings();
   settings.enableWindowsNotifications = !!enabled;
+  savePersistedSettings(settings);
+  return { success: true };
+});
+
+// Add at top-level, after other IPC handlers
+ipcMain.handle('get-close-action-setting', async () => {
+  let settings = loadPersistedSettings();
+  return settings.closeAction || 'ask';
+});
+ipcMain.handle('set-close-action-setting', async (event, value) => {
+  let settings = loadPersistedSettings();
+  settings.closeAction = value;
   savePersistedSettings(settings);
   return { success: true };
 }); 

@@ -39,13 +39,10 @@
       </label>
     </div>
     <!-- Step 5: SteamID & Config Path Display -->
-    <div id="steamid-config-section" style="margin-bottom: 1rem;">
-      <div>SteamID: <span id="steamid-value">N/A</span></div>
+    <div id="config-section" style="margin-bottom: 1rem;">
       <div>Config Path: <span id="config-path-value">N/A</span></div>
       <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
-      <button id="change-steamid-btn" style="margin-top: 0.5em; margin-left: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Change SteamID</button>
     </div>
-    <p>Placeholder UI - Step 3</p>
     <script>
       const form = document.getElementById('grid-form');
       const selectedGrid = document.getElementById('selected-grid');
@@ -61,7 +58,7 @@
         const gridType = form.grid.value;
         if (ipcRenderer) {
           // Step 1: Get config path
-          const configResult = await ipcRenderer.invoke('get-steamid-and-config-path');
+          const configResult = await ipcRenderer.invoke('get-config-path');
           if (!configResult || !configResult.configPath) {
             showStatus('Config path not found. Please select your config folder.', '#f00');
             return;
@@ -106,23 +103,18 @@
       }
       // Step 5: SteamID and config path detection
       const { ipcRenderer } = window.require ? window.require('electron') : {};
-      async function updateSteamIDAndConfigPath() {
+      async function updateConfigPath() {
         if (ipcRenderer) {
-          const result = await ipcRenderer.invoke('get-steamid-and-config-path');
-          if (result && result.steamid && result.configPath) {
-            document.getElementById('steamid-value').textContent = result.steamid;
-            document.getElementById('config-path-value').textContent = result.configPath + (result.manual ? ' (manual)' : '');
+          const result = await ipcRenderer.invoke('get-config-path');
+          if (result && result.configPath) {
+            document.getElementById('config-path-value').textContent = result.configPath;
           } else {
-            document.getElementById('steamid-value').textContent = 'N/A';
             document.getElementById('config-path-value').textContent = 'N/A';
-            showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
-            // Auto-prompt for folder selection if config path is missing
-            if (result && result.error) {
-              // Only prompt once per error occurrence
+            // Show a notice before opening the file dialog
+            if (window.confirm('No Dota 2 config folder is set.\n\nPlease select your Dota 2 config directory. This is required for the app to update your hero grid.')) {
               const folderPath = await ipcRenderer.invoke('select-config-folder');
               if (folderPath) {
-                // After persisting, re-fetch config info to update UI
-                updateSteamIDAndConfigPath();
+                updateConfigPath();
                 showStatus('Config path updated and saved!', '#0f0');
               }
             }
@@ -131,7 +123,7 @@
           showStatus('Electron IPC not available.', '#f00');
         }
       }
-      updateSteamIDAndConfigPath();
+      updateConfigPath();
       // Step 6: Manual Config Path Selection
       const selectConfigBtn = document.getElementById('select-config-folder-btn');
       selectConfigBtn.addEventListener('click', async () => {
@@ -139,27 +131,11 @@
           const folderPath = await ipcRenderer.invoke('select-config-folder');
           if (folderPath) {
             // After persisting, re-fetch config info to update UI
-            updateSteamIDAndConfigPath();
+            updateConfigPath();
             showStatus('Config path updated and saved!', '#0f0');
           }
         } else {
           showStatus('Folder selection not available in this environment.', '#f00');
-        }
-      });
-      // Change SteamID button logic
-      const changeSteamIDBtn = document.getElementById('change-steamid-btn');
-      changeSteamIDBtn.addEventListener('click', async () => {
-        if (ipcRenderer) {
-          const result = await ipcRenderer.invoke('get-steamid-and-config-path', { forceSelect: true });
-          if (result && result.steamid && result.configPath) {
-            document.getElementById('steamid-value').textContent = result.steamid;
-            document.getElementById('config-path-value').textContent = result.configPath;
-            showStatus('SteamID updated!', '#0af');
-          } else {
-            document.getElementById('steamid-value').textContent = 'N/A';
-            document.getElementById('config-path-value').textContent = 'N/A';
-            showStatus(result && result.error ? result.error : 'Could not detect SteamID.', '#f00');
-          }
         }
       });
       // Phase 13: Windows Notifications Option

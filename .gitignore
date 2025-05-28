@@ -12,5 +12,5 @@ Thumbs.db
 *.log
 
 # Optional: Uncomment if you add build output
-# dist/
-# build/ 
+dist/
+build/

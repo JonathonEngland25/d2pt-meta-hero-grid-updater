@@ -4,43 +4,152 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=800, initial-scale=1.0">
-  <title>Preferences - Dota 2 Meta Hero Grid Updater</title>
+  <title>Preferences</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: #222; color: #fff; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh; background: #222; color: #fff; font-size: 0.97rem; }
     .container { text-align: center; }
-    h1 { font-size: 2rem; margin-bottom: 1rem; }
-    label { display: block; margin: 1em 0 0.5em 0; }
-    input[type="text"] { width: 60%; padding: 0.5em; }
-    select { padding: 0.5em; }
-    button { margin-top: 2em; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer; }
-    .setting-group { margin-bottom: 1.5em; }
+    .prefs-card {
+      background: #23272f;
+      border-radius: 1.2em;
+      box-shadow: 0 4px 32px #0008;
+      padding: 1.5em 1.3em 1.1em 1.3em;
+      max-width: 440px;
+      margin: 0 auto;
+      text-align: left;
+      position: relative;
+    }
+    h1 { font-size: 1.18rem; margin-bottom: 1.1rem; color: #fff; text-align: left; margin-left: 0.1em; font-weight: 600; letter-spacing: 0.01em; }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7em;
+      margin-bottom: 1.1em;
+    }
+    .setting-row:last-child { margin-bottom: 0; }
+    .setting-icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+    }
+    .setting-label {
+      min-width: 120px;
+      color: #b0b8c1;
+      font-size: 0.98em;
+      margin-right: 0.3em;
+      text-align: left;
+    }
+    .setting-control {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.5em 0.8em;
+      border-radius: 0.5em;
+      border: 1.2px solid #2b3a4a;
+      background: #181a20;
+      color: #eaf6ff;
+      font-size: 0.97em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+    select:focus, input[type="text"]:focus {
+      border: 1.2px solid #8ab4f8;
+      outline: none;
+    }
+    input[type="checkbox"] {
+      accent-color: #3b82f6;
+      transform: scale(1.1);
+      margin: 0 0.4em 0 0;
+    }
+    .config-path-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      width: 100%;
+    }
+    #config-path-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    button[type="button"] {
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      border-radius: 0.5em;
+      font-size: 0.97rem;
+      font-weight: 500;
+      padding: 0.5em 1.2em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0004;
+      transition: background 0.2s, box-shadow 0.2s;
+      margin: 0;
+      display: block;
+    }
+    button[type="button"]:hover {
+      background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+      box-shadow: 0 4px 16px #0006;
+    }
+    #status-area {
+      min-height: 1.5em;
+      margin-top: 0.7em;
+      color: #0f0;
+      font-weight: 500;
+      text-align: left;
+      margin-left: 0.1em;
+      font-size: 0.97em;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Preferences</h1>
-    <form id="preferences-form">
-      <div class="setting-group">
-        <label for="close-action-select">On window close:</label>
-        <select id="close-action-select">
-          <option value="ask">Ask every time</option>
-          <option value="minimize">Minimize to tray</option>
-          <option value="exit">Exit application</option>
-        </select>
-      </div>
-      <div class="setting-group">
-        <label>
-          <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
-        </label>
-      </div>
-      <div class="setting-group">
-        <label for="config-path-input">Dota 2 Config Path:</label>
-        <input type="text" id="config-path-input" readonly>
-        <button type="button" id="select-config-folder-btn">Change...</button>
-      </div>
-      <button type="button" id="back-btn">Back to Main</button>
-      <div id="status-area" style="min-height: 2em; margin-top: 1em; color: #0f0; font-weight: bold;"></div>
-    </form>
+    <div class="prefs-card">
+      <h1>Preferences</h1>
+      <form id="preferences-form" autocomplete="off">
+        <div class="setting-row">
+          <span class="setting-icon">
+            <!-- Folder Icon -->
+            <svg width="22" height="22" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+          </span>
+          <span class="setting-label">Dota 2 Config Path:</span>
+          <span class="setting-control config-path-row">
+            <input type="text" id="config-path-input" readonly>
+            <button type="button" id="select-config-folder-btn">Change</button>
+          </span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-icon">
+            <!-- Power Icon -->
+            <svg width="22" height="22" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M6.2 6.2a8 8 0 1 0 11.6 0"/></svg>
+          </span>
+          <span class="setting-label">On window close:</span>
+          <span class="setting-control">
+            <select id="close-action-select">
+              <option value="ask">Ask every time</option>
+              <option value="minimize">Minimize to tray</option>
+              <option value="exit">Exit application</option>
+            </select>
+          </span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-icon">
+            <!-- Bell Icon -->
+            <svg width="22" height="22" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </span>
+          <span class="setting-label">Enable notifications:</span>
+          <span class="setting-control">
+            <input type="checkbox" id="windows-notify-checkbox">
+          </span>
+        </div>
+        <div id="status-area"></div>
+      </form>
+    </div>
   </div>
   <script>
     const { ipcRenderer } = window.require ? window.require('electron') : {};
@@ -48,7 +157,6 @@
     const notifyCheckbox = document.getElementById('windows-notify-checkbox');
     const configPathInput = document.getElementById('config-path-input');
     const selectConfigBtn = document.getElementById('select-config-folder-btn');
-    const backBtn = document.getElementById('back-btn');
     const statusArea = document.getElementById('status-area');
 
     function showStatus(message, color = '#0f0') {
@@ -92,10 +200,6 @@
           showStatus('Config path updated and saved!', '#0f0');
         }
       }
-    });
-
-    backBtn.addEventListener('click', () => {
-      window.location.href = 'index.html';
     });
 
     loadSettings();

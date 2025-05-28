@@ -46,11 +46,21 @@ function createWindow() {
           buttons: ['Minimize to Tray', 'Exit', 'Cancel'],
           defaultId: 0,
           cancelId: 2,
-          noLink: true
+          noLink: true,
+          checkboxLabel: 'Remember my choice',
+          checkboxChecked: false
         });
         if (result.response === 0) { // Minimize to Tray
+          if (result.checkboxChecked) {
+            settings.closeAction = 'minimize';
+            savePersistedSettings(settings);
+          }
           mainWindow.hide();
         } else if (result.response === 1) { // Exit
+          if (result.checkboxChecked) {
+            settings.closeAction = 'exit';
+            savePersistedSettings(settings);
+          }
           app.isQuiting = true;
           app.quit();
         } // else Cancel: do nothing

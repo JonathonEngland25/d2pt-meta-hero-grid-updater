@@ -35,22 +35,47 @@
     <!-- End No Config Info Card -->
     <!-- Main App Content (hidden until config is set) -->
     <div id="main-app-content" style="display:none;">
-      <form id="grid-form" style="margin-bottom: 1.5rem;">
-        <label style="margin-right: 1em;">
-          <input type="radio" name="grid" value="Most Played" checked>
-          Most Played
-        </label>
-        <label style="margin-right: 1em;">
-          <input type="radio" name="grid" value="High Win Rate">
-          High Win Rate
-        </label>
-        <label>
-          <input type="radio" name="grid" value="D2PT Rating">
-          D2PT Rating
-        </label>
-      </form>
-      <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
-      <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
+      <div id="grid-card-list" style="display: flex; gap: 2em; justify-content: center; margin-bottom: 2.5em; flex-wrap: wrap;">
+        <!-- Most Played Card -->
+        <div class="grid-card" data-grid="Most Played" style="background: linear-gradient(135deg, #22303f 80%, #2b3a4a 100%); border-radius: 1em; box-shadow: 0 4px 24px #0007; padding: 2em 1.5em 1.5em 1.5em; width: 300px; max-width: 90vw; display: flex; flex-direction: column; align-items: center; border: 2px solid transparent; transition: border 0.2s;">
+          <div style="background: #1a2733; border-radius: 0.7em; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 1em;">
+            <!-- Bar Chart Icon -->
+            <svg width="28" height="28" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="8"/><rect x="9" y="8" width="4" height="12"/><rect x="15" y="4" width="4" height="16"/></svg>
+          </div>
+          <div style="font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 0.5em;">Most Played</div>
+          <div style="color: #b0b8c1; font-size: 1em; text-align: center; margin-bottom: 1.5em;">Top 7 most picked heroes by role in High MMR Pub Matches. Based on pick frequency in the current patch.</div>
+          <button class="download-btn" data-grid="Most Played" style="background: #29465b; color: #eaf6ff; border: none; border-radius: 0.5em; font-size: 1.08rem; font-weight: 500; padding: 0.7em 2.2em; cursor: pointer; box-shadow: 0 2px 8px #0004; display: flex; align-items: center; gap: 0.6em; transition: background 0.2s; width: 100%; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="#eaf6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            Download
+          </button>
+        </div>
+        <!-- High Winrate Card -->
+        <div class="grid-card" data-grid="High Win Rate" style="background: linear-gradient(135deg, #1e3530 80%, #25443a 100%); border-radius: 1em; box-shadow: 0 4px 24px #0007; padding: 2em 1.5em 1.5em 1.5em; width: 300px; max-width: 90vw; display: flex; flex-direction: column; align-items: center; border: 2px solid transparent; transition: border 0.2s;">
+          <div style="background: #1a2e28; border-radius: 0.7em; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 1em;">
+            <!-- Check Circle Icon -->
+            <svg width="28" height="28" fill="none" stroke="#7be7b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2l4-4"/></svg>
+          </div>
+          <div style="font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 0.5em;">High Winrate</div>
+          <div style="color: #b0b8c1; font-size: 1em; text-align: center; margin-bottom: 1.5em;">Most played heroes with &gt;50% winrate by role. Balanced approach focusing on both popularity and success rate.</div>
+          <button class="download-btn" data-grid="High Win Rate" style="background: #295b4a; color: #eaf6ff; border: none; border-radius: 0.5em; font-size: 1.08rem; font-weight: 500; padding: 0.7em 2.2em; cursor: pointer; box-shadow: 0 2px 8px #0004; display: flex; align-items: center; gap: 0.6em; transition: background 0.2s; width: 100%; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="#eaf6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            Download
+          </button>
+        </div>
+        <!-- D2PT Rating Card -->
+        <div class="grid-card" data-grid="D2PT Rating" style="background: linear-gradient(135deg, #35381e 80%, #444225 100%); border-radius: 1em; box-shadow: 0 4px 24px #0007; padding: 2em 1.5em 1.5em 1.5em; width: 300px; max-width: 90vw; display: flex; flex-direction: column; align-items: center; border: 2px solid transparent; transition: border 0.2s;">
+          <div style="background: #2e2c1a; border-radius: 0.7em; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 1em;">
+            <!-- Star Icon -->
+            <svg width="28" height="28" fill="none" stroke="#e7e67b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>
+          </div>
+          <div style="font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 0.5em;">D2PT Rating</div>
+          <div style="color: #b0b8c1; font-size: 1em; text-align: center; margin-bottom: 1.5em;">Top heroes ranked by D2PT's Rating System. Advanced algorithm considering multiple performance metrics.</div>
+          <button class="download-btn" data-grid="D2PT Rating" style="background: #5b5729; color: #eaf6ff; border: none; border-radius: 0.5em; font-size: 1.08rem; font-weight: 500; padding: 0.7em 2.2em; cursor: pointer; box-shadow: 0 2px 8px #0004; display: flex; align-items: center; gap: 0.6em; transition: background 0.2s; width: 100%; justify-content: center;">
+            <svg width="18" height="18" fill="none" stroke="#eaf6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
       <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
       <!-- Phase 13: Windows Notifications Option -->
       <div style="margin-bottom: 1rem;">
@@ -66,105 +91,40 @@
     </div>
     <!-- End Main App Content -->
     <script>
-      const form = document.getElementById('grid-form');
-      const selectedGrid = document.getElementById('selected-grid');
-      form.addEventListener('change', (e) => {
-        const value = form.grid.value;
-        selectedGrid.innerHTML = `Selected: <b>${value}</b>`;
-      });
-      // Step 3: Download & Update button click event
-      const downloadBtn = document.getElementById('download-update-btn');
-      const statusArea = document.getElementById('status-area');
-      downloadBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const gridType = form.grid.value;
-        if (ipcRenderer) {
-          // Step 1: Get config path
-          const configResult = await ipcRenderer.invoke('get-config-path');
-          if (!configResult || !configResult.configPath) {
-            showStatus('Config path not found. Please select your config folder.', '#f00');
-            return;
-          }
-          // Step 2: Backup existing grid
-          showStatus('Backing up existing grid (if present)...', '#0af');
-          const backupResult = await ipcRenderer.invoke('backup-hero-grid', { configPath: configResult.configPath, silent: false });
-          if (!backupResult.success) {
-            showStatus('Backup failed: ' + backupResult.error, '#f00');
-            return;
-          }
-          if (backupResult.didBackup) {
-            showStatus('Backup created. Downloading grid...', '#0af');
-          } else {
-            showStatus('No existing grid to back up. Downloading grid...', '#0af');
-          }
-          // Step 3: Download grid
-          const result = await ipcRenderer.invoke('download-grid-json', gridType);
-          if (result.success) {
-            showStatus('Download successful! Example: ' + JSON.stringify(result.json).slice(0, 100) + '...');
-            console.log('Downloaded grid JSON:', result.json);
-            // Phase 12: Replace grid
-            const replaceResult = await ipcRenderer.invoke('replace-hero-grid', { configPath: configResult.configPath, json: result.json });
-            if (replaceResult.success) {
-              showStatus('Grid updated successfully!', '#0f0');
+      document.addEventListener('DOMContentLoaded', function() {
+        const statusArea = document.getElementById('status-area');
+        // Step 5: SteamID and config path detection
+        const { ipcRenderer } = window.require ? window.require('electron') : {};
+        async function updateConfigPath() {
+          if (ipcRenderer) {
+            const result = await ipcRenderer.invoke('get-config-path');
+            const noConfigCard = document.getElementById('no-config-card');
+            const mainAppContent = document.getElementById('main-app-content');
+            if (result && result.configPath) {
+              document.getElementById('config-path-value').textContent = result.configPath;
+              if (noConfigCard) noConfigCard.style.display = 'none';
+              if (mainAppContent) mainAppContent.style.display = 'block';
             } else {
-              showStatus('Failed to update grid: ' + replaceResult.error, '#f00');
+              document.getElementById('config-path-value').textContent = 'N/A';
+              if (noConfigCard) noConfigCard.style.display = 'block';
+              if (mainAppContent) mainAppContent.style.display = 'none';
             }
           } else {
-            showStatus('Download failed: ' + result.error, '#f00');
-            console.error('Download error:', result.error);
+            showStatus('Electron IPC not available.', '#f00');
           }
-        } else {
-          showStatus('Download not available in this environment.', '#f00');
         }
-      });
-      // Step 4: Status area notification function
-      function showStatus(message, color = '#0f0') {
-        statusArea.textContent = message;
-        statusArea.style.color = color;
-        // Removed auto-clear for persistent status messages
-      }
-      // Step 5: SteamID and config path detection
-      const { ipcRenderer } = window.require ? window.require('electron') : {};
-      async function updateConfigPath() {
-        if (ipcRenderer) {
-          const result = await ipcRenderer.invoke('get-config-path');
-          const noConfigCard = document.getElementById('no-config-card');
-          const mainAppContent = document.getElementById('main-app-content');
-          if (result && result.configPath) {
-            document.getElementById('config-path-value').textContent = result.configPath;
-            if (noConfigCard) noConfigCard.style.display = 'none';
-            if (mainAppContent) mainAppContent.style.display = 'block';
-          } else {
-            document.getElementById('config-path-value').textContent = 'N/A';
-            if (noConfigCard) noConfigCard.style.display = 'block';
-            if (mainAppContent) mainAppContent.style.display = 'none';
-          }
-        } else {
-          showStatus('Electron IPC not available.', '#f00');
+        function showStatus(message, color = '#0f0') {
+          statusArea.textContent = message;
+          statusArea.style.color = color;
         }
-      }
-      updateConfigPath();
-      // Step 6: Manual Config Path Selection
-      const selectConfigBtn = document.getElementById('select-config-folder-btn');
-      selectConfigBtn.addEventListener('click', async () => {
-        if (ipcRenderer) {
-          const folderPath = await ipcRenderer.invoke('select-config-folder');
-          if (folderPath) {
-            // After persisting, re-fetch config info to update UI
-            updateConfigPath();
-            showStatus('Config path updated and saved!', '#0f0');
-          }
-        } else {
-          showStatus('Folder selection not available in this environment.', '#f00');
-        }
-      });
-      // Attach handler for the prominent select button in the info card
-      const noConfigSelectBtn = document.getElementById('no-config-select-btn');
-      if (noConfigSelectBtn) {
-        noConfigSelectBtn.addEventListener('click', async () => {
+        updateConfigPath();
+        // Step 6: Manual Config Path Selection
+        const selectConfigBtn = document.getElementById('select-config-folder-btn');
+        selectConfigBtn.addEventListener('click', async () => {
           if (ipcRenderer) {
             const folderPath = await ipcRenderer.invoke('select-config-folder');
             if (folderPath) {
+              // After persisting, re-fetch config info to update UI
               updateConfigPath();
               showStatus('Config path updated and saved!', '#0f0');
             }
@@ -172,22 +132,82 @@
             showStatus('Folder selection not available in this environment.', '#f00');
           }
         });
-      }
-      // Phase 13: Windows Notifications Option
-      const notifyCheckbox = document.getElementById('windows-notify-checkbox');
-      async function updateNotifyCheckbox() {
-        if (ipcRenderer) {
-          const result = await ipcRenderer.invoke('get-notification-setting');
-          notifyCheckbox.checked = !!(result && result.enabled);
+        // Attach handler for the prominent select button in the info card
+        const noConfigSelectBtn = document.getElementById('no-config-select-btn');
+        if (noConfigSelectBtn) {
+          noConfigSelectBtn.addEventListener('click', async () => {
+            if (ipcRenderer) {
+              const folderPath = await ipcRenderer.invoke('select-config-folder');
+              if (folderPath) {
+                updateConfigPath();
+                showStatus('Config path updated and saved!', '#0f0');
+              }
+            } else {
+              showStatus('Folder selection not available in this environment.', '#f00');
+            }
+          });
         }
-      }
-      notifyCheckbox.addEventListener('change', async () => {
-        if (ipcRenderer) {
-          await ipcRenderer.invoke('set-notification-setting', notifyCheckbox.checked);
-          showStatus('Windows notifications ' + (notifyCheckbox.checked ? 'enabled!' : 'disabled!'), '#0af');
+        // Phase 13: Windows Notifications Option
+        const notifyCheckbox = document.getElementById('windows-notify-checkbox');
+        async function updateNotifyCheckbox() {
+          if (ipcRenderer) {
+            const result = await ipcRenderer.invoke('get-notification-setting');
+            notifyCheckbox.checked = !!(result && result.enabled);
+          }
         }
+        notifyCheckbox.addEventListener('change', async () => {
+          if (ipcRenderer) {
+            await ipcRenderer.invoke('set-notification-setting', notifyCheckbox.checked);
+            showStatus('Windows notifications ' + (notifyCheckbox.checked ? 'enabled!' : 'disabled!'), '#0af');
+          }
+        });
+        updateNotifyCheckbox();
+        // Card download logic
+        document.querySelectorAll('.download-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const gridType = btn.getAttribute('data-grid');
+            if (ipcRenderer) {
+              // Step 1: Get config path
+              const configResult = await ipcRenderer.invoke('get-config-path');
+              if (!configResult || !configResult.configPath) {
+                showStatus('Config path not found. Please select your config folder.', '#f00');
+                return;
+              }
+              // Step 2: Backup existing grid
+              showStatus('Backing up existing grid (if present)...', '#0af');
+              const backupResult = await ipcRenderer.invoke('backup-hero-grid', { configPath: configResult.configPath, silent: false });
+              if (!backupResult.success) {
+                showStatus('Backup failed: ' + backupResult.error, '#f00');
+                return;
+              }
+              if (backupResult.didBackup) {
+                showStatus('Backup created. Downloading grid...', '#0af');
+              } else {
+                showStatus('No existing grid to back up. Downloading grid...', '#0af');
+              }
+              // Step 3: Download grid
+              const result = await ipcRenderer.invoke('download-grid-json', gridType);
+              if (result.success) {
+                showStatus('Download successful! Example: ' + JSON.stringify(result.json).slice(0, 100) + '...');
+                console.log('Downloaded grid JSON:', result.json);
+                // Phase 12: Replace grid
+                const replaceResult = await ipcRenderer.invoke('replace-hero-grid', { configPath: configResult.configPath, json: result.json });
+                if (replaceResult.success) {
+                  showStatus('Grid updated successfully!', '#0f0');
+                } else {
+                  showStatus('Failed to update grid: ' + replaceResult.error, '#f00');
+                }
+              } else {
+                showStatus('Download failed: ' + result.error, '#f00');
+                console.error('Download error:', result.error);
+              }
+            } else {
+              showStatus('Download not available in this environment.', '#f00');
+            }
+          });
+        });
       });
-      updateNotifyCheckbox();
     </script>
   </div>
 </body>

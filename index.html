@@ -15,34 +15,56 @@
 <body>
   <div class="container">
     <h1>Dota 2 Meta Hero Grid Updater</h1>
-    <form id="grid-form" style="margin-bottom: 1.5rem;">
-      <label style="margin-right: 1em;">
-        <input type="radio" name="grid" value="Most Played" checked>
-        Most Played
-      </label>
-      <label style="margin-right: 1em;">
-        <input type="radio" name="grid" value="High Win Rate">
-        High Win Rate
-      </label>
-      <label>
-        <input type="radio" name="grid" value="D2PT Rating">
-        D2PT Rating
-      </label>
-    </form>
-    <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
-    <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
-    <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
-    <!-- Phase 13: Windows Notifications Option -->
-    <div style="margin-bottom: 1rem;">
-      <label>
-        <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
-      </label>
+    <!-- No Config Info Card -->
+    <div id="no-config-card" style="display:none; max-width: 480px; margin: 0 auto 2rem auto; background: #23272f; border: 2px dashed #444; border-radius: 1.2em; box-shadow: 0 4px 32px #0008; padding: 2.2em 2em 1.5em 2em; text-align: center; position: relative;">
+      <div style="display: flex; justify-content: center; margin-bottom: 1.2em;">
+        <div style="background: #181a20; border-radius: 1em; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px #0006;">
+          <!-- Folder SVG Icon -->
+          <svg width="32" height="32" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+        </div>
+      </div>
+      <h2 style="font-size: 1.3rem; color: #fff; font-weight: 500; margin-bottom: 0.5em;">No Configuration Folder Selected</h2>
+      <p style="color: #b0b8c1; font-size: 1rem; margin-bottom: 1.5em;">A configuration folder is required to store your application settings and update your Dota 2 hero grid. Please select your Dota 2 config folder to continue.</p>
+      <button id="no-config-select-btn" style="background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); color: #fff; border: none; border-radius: 0.6em; font-size: 1.08rem; font-weight: 500; padding: 0.7em 2.2em; cursor: pointer; box-shadow: 0 2px 8px #0004; transition: background 0.2s; margin-bottom: 0.7em;">Select Config Folder</button>
+      <div style="margin-top: 0.7em; color: #8ab4f8; font-size: 0.92em; display: flex; align-items: center; justify-content: center; gap: 0.4em;">
+        <!-- Settings SVG Icon -->
+        <svg width="16" height="16" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 4.6V4a2 2 0 1 1 4 0v.09c0 .66.39 1.26 1 1.51a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.25.61.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.26.39-1.51 1z"/></svg>
+        <span>Your settings will be stored securely in the selected location</span>
+      </div>
     </div>
-    <!-- Step 5: SteamID & Config Path Display -->
-    <div id="config-section" style="margin-bottom: 1rem;">
-      <div>Config Path: <span id="config-path-value">N/A</span></div>
-      <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
+    <!-- End No Config Info Card -->
+    <!-- Main App Content (hidden until config is set) -->
+    <div id="main-app-content" style="display:none;">
+      <form id="grid-form" style="margin-bottom: 1.5rem;">
+        <label style="margin-right: 1em;">
+          <input type="radio" name="grid" value="Most Played" checked>
+          Most Played
+        </label>
+        <label style="margin-right: 1em;">
+          <input type="radio" name="grid" value="High Win Rate">
+          High Win Rate
+        </label>
+        <label>
+          <input type="radio" name="grid" value="D2PT Rating">
+          D2PT Rating
+        </label>
+      </form>
+      <div id="selected-grid" style="margin-bottom: 1rem;">Selected: <b>Most Played</b></div>
+      <button id="download-update-btn" style="margin-bottom: 1rem; padding: 0.5em 1.5em; font-size: 1rem; cursor: pointer;">Download & Update</button>
+      <div id="status-area" style="min-height: 2em; margin-bottom: 1rem; color: #0f0; font-weight: bold;"></div>
+      <!-- Phase 13: Windows Notifications Option -->
+      <div style="margin-bottom: 1rem;">
+        <label>
+          <input type="checkbox" id="windows-notify-checkbox"> Enable Windows notifications for updates
+        </label>
+      </div>
+      <!-- Step 5: SteamID & Config Path Display -->
+      <div id="config-section" style="margin-bottom: 1rem;">
+        <div>Config Path: <span id="config-path-value">N/A</span></div>
+        <button id="select-config-folder-btn" style="margin-top: 0.5em; padding: 0.3em 1em; font-size: 0.95rem; cursor: pointer;">Select Config Folder</button>
+      </div>
     </div>
+    <!-- End Main App Content -->
     <script>
       const form = document.getElementById('grid-form');
       const selectedGrid = document.getElementById('selected-grid');
@@ -106,18 +128,16 @@
       async function updateConfigPath() {
         if (ipcRenderer) {
           const result = await ipcRenderer.invoke('get-config-path');
+          const noConfigCard = document.getElementById('no-config-card');
+          const mainAppContent = document.getElementById('main-app-content');
           if (result && result.configPath) {
             document.getElementById('config-path-value').textContent = result.configPath;
+            if (noConfigCard) noConfigCard.style.display = 'none';
+            if (mainAppContent) mainAppContent.style.display = 'block';
           } else {
             document.getElementById('config-path-value').textContent = 'N/A';
-            // Show a notice before opening the file dialog
-            if (window.confirm('No Dota 2 config folder is set.\n\nPlease select your Dota 2 config directory. This is required for the app to update your hero grid.')) {
-              const folderPath = await ipcRenderer.invoke('select-config-folder');
-              if (folderPath) {
-                updateConfigPath();
-                showStatus('Config path updated and saved!', '#0f0');
-              }
-            }
+            if (noConfigCard) noConfigCard.style.display = 'block';
+            if (mainAppContent) mainAppContent.style.display = 'none';
           }
         } else {
           showStatus('Electron IPC not available.', '#f00');
@@ -138,6 +158,21 @@
           showStatus('Folder selection not available in this environment.', '#f00');
         }
       });
+      // Attach handler for the prominent select button in the info card
+      const noConfigSelectBtn = document.getElementById('no-config-select-btn');
+      if (noConfigSelectBtn) {
+        noConfigSelectBtn.addEventListener('click', async () => {
+          if (ipcRenderer) {
+            const folderPath = await ipcRenderer.invoke('select-config-folder');
+            if (folderPath) {
+              updateConfigPath();
+              showStatus('Config path updated and saved!', '#0f0');
+            }
+          } else {
+            showStatus('Folder selection not available in this environment.', '#f00');
+          }
+        });
+      }
       // Phase 13: Windows Notifications Option
       const notifyCheckbox = document.getElementById('windows-notify-checkbox');
       async function updateNotifyCheckbox() {

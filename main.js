@@ -10,6 +10,7 @@ app.setName('d2pt-meta-hero-grid-updater');
 
 let tray = null;
 let mainWindow = null;
+let preferencesWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -86,17 +87,57 @@ app.whenReady().then(() => {
     {
       label: 'File',
       submenu: [
-        {
-          label: 'Preferences',
-          accelerator: isMac ? 'Cmd+,' : 'Ctrl+,',
-          click: () => {
-            if (mainWindow) {
-              mainWindow.loadFile('preferences.html');
-            }
-          }
-        },
-        { type: 'separator' },
         { role: isMac ? 'close' : 'quit' }
+      ]
+    },
+    {
+      label: 'Preferences',
+      accelerator: isMac ? 'Cmd+,' : 'Ctrl+,',
+      click: () => {
+        if (preferencesWindow && !preferencesWindow.isDestroyed()) {
+          preferencesWindow.show();
+          preferencesWindow.focus();
+          return;
+        }
+        preferencesWindow = new BrowserWindow({
+          width: 540,
+          height: 340,
+          resizable: false,
+          minimizable: false,
+          maximizable: false,
+          parent: mainWindow,
+          modal: false,
+          show: false,
+          webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+          },
+        });
+        preferencesWindow.setMenuBarVisibility(false);
+        preferencesWindow.loadFile('preferences.html');
+        preferencesWindow.once('ready-to-show', () => {
+          preferencesWindow.show();
+        });
+        preferencesWindow.on('closed', () => {
+          preferencesWindow = null;
+        });
+      }
+    },
+    {
+      label: 'Help',
+      role: 'help',
+      submenu: [
+        {
+          label: 'About',
+          click: () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'About',
+              message: 'Dota 2 Meta Hero Grid Updater',
+              detail: 'This app helps you download and update your in-game meta hero grids for Dota 2 from dota2protracker.com.\n\nCreated by Jonathon England.'
+            });
+          }
+        }
       ]
     }
   ];
